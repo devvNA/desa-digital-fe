@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/auth";
 import { createRouter, createWebHistory } from "vue-router";
 
 import AuthLayout from "@/layouts/AuthLayout.vue";
@@ -17,6 +18,7 @@ const router = createRouter({
           path: "",
           name: "dashboard",
           component: DashboardView,
+          meta: { requiresAuth: true, permission: "dashboard-menu" },
         },
       ],
     },
@@ -28,10 +30,43 @@ const router = createRouter({
           path: "",
           name: "login",
           component: LoginView,
+          meta: { requiresUnauth: true },
         },
       ],
     },
   ],
+});
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore();
+
+  if (to.meta.requiresAuth) {
+    if (authStore.token) {
+      try {
+        if (!authStore.user) {
+          await authStore.checkAuth();
+        }
+
+        const userPermissions = authStore.user?.permissions || [];
+
+        if (to.meta.permission && !userPermissions.includes(to.meta.permission)) {
+          next({ name: "Error 403" });
+          return;
+        }
+
+        next();
+      } catch (error) {
+        console.log(error);
+        next({ name: "login" });
+      }
+    } else {
+      next({ name: "login" });
+    }
+  } else if (to.meta.requiresUnauth && authStore.token) {
+    next({ name: "dashboard" });
+  } else {
+    next();
+  }
 });
 
 export default router;
