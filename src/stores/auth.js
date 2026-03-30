@@ -7,14 +7,11 @@ import { defineStore } from "pinia";
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: null,
+    token: Cookies.get("token") || null,
     error: null,
     success: null,
     loading: false,
   }),
-
-  getters: {
-    token: () => Cookies.get("token"),
-  },
 
   actions: {
     resetFeedback() {
@@ -28,13 +25,11 @@ export const useAuthStore = defineStore("auth", {
 
       try {
         const response = await axiosInstance.post("/login", credentials);
-        const token = response.data.token;
+        const newToken = response.data.token;
 
-        Cookies.set("token", token);
-        await this.checkAuth();
-
+        Cookies.set("token", newToken);
+        this.token = newToken;
         this.success = response.data.message || "Login successful";
-        await router.push({ name: "dashboard" });
 
         return { success: true };
       } catch (error) {
@@ -47,10 +42,11 @@ export const useAuthStore = defineStore("auth", {
 
     async logout() {
       Cookies.remove("token");
-      router.push({ name: "login" });
+      this.token = null;
       this.user = null;
       this.error = null;
       this.success = "Logout successful";
+      router.push({ name: "login" });
     },
 
     async checkAuth() {

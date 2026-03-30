@@ -37,35 +37,30 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to) => {
   const authStore = useAuthStore();
 
   if (to.meta.requiresAuth) {
-    if (authStore.token) {
-      try {
-        if (!authStore.user) {
-          await authStore.checkAuth();
-        }
+    if (!authStore.token) {
+      return { name: "login" };
+    }
 
-        const userPermissions = authStore.user?.permissions || [];
-
-        if (to.meta.permission && !userPermissions.includes(to.meta.permission)) {
-          next({ name: "Error 403" });
-          return;
-        }
-
-        next();
-      } catch (error) {
-        console.log(error);
-        next({ name: "login" });
+    try {
+      if (!authStore.user) {
+        await authStore.checkAuth();
       }
-    } else {
-      next({ name: "login" });
+
+      const userPermissions = authStore.user?.permissions || [];
+
+      if (to.meta.permission && !userPermissions.includes(to.meta.permission)) {
+        return false;
+      }
+    } catch (error) {
+      console.error("[Router Guard] checkAuth failed:", error);
+      return { name: "login" };
     }
   } else if (to.meta.requiresUnauth && authStore.token) {
-    next({ name: "dashboard" });
-  } else {
-    next();
+    return { name: "dashboard" };
   }
 });
 

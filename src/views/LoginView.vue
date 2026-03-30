@@ -8,9 +8,11 @@ import Input from '@/components/ui/Input.vue'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const authStore = useAuthStore()
-const { loading, error, success } = storeToRefs(authStore)
+const { loading, error } = storeToRefs(authStore)
 
 const form = ref({
   role: '',
@@ -52,7 +54,7 @@ const handleSubmit = async () => {
   const result = await authStore.login({ ...form.value })
 
   if (result.success) {
-    alert(success.value || 'Login berhasil')
+    await router.push({ name: 'dashboard' })
     return
   }
 
