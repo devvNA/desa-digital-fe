@@ -18,6 +18,10 @@ defineProps({
     type: [String, Array],
     default: '',
   },
+  maxlength: {
+    type: [String, Number],
+    default: null,
+  },
   icon: {
     type: String,
     required: true,
@@ -38,6 +42,7 @@ const emit = defineEmits(['update:modelValue'])
         :placeholder="placeholder"
         :type="type"
         :value="modelValue"
+        :maxlength="maxlength"
         @input="emit('update:modelValue', $event.target.value)"
         class="peer w-full h-[56px] rounded-2xl pl-[48px] pr-4 border-[1.5px] border-desa-background font-medium leading-5 focus:outline-none placeholder:leading-5 placeholder:text-desa-secondary placeholder:font-medium transition-all duration-300"
         :class="

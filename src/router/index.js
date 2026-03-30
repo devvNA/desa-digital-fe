@@ -7,6 +7,7 @@ import MainLayout from "@/layouts/MainLayout.vue";
 const DashboardView = () => import("@/views/DashboardView.vue");
 const HeadOfFamiliesView = () => import("@/views/head-of-family/HeadOfFamiliesView.vue");
 const HeadOfFamilyView = () => import("@/views/head-of-family/HeadOfFamilyView.vue");
+const HeadOfFamilyCreateView = () => import("@/views/head-of-family/HeadOfFamilyCreateView.vue");
 const LoginView = () => import("@/views/LoginView.vue");
 
 const router = createRouter({
@@ -33,6 +34,12 @@ const router = createRouter({
           name: "manage-head-of-family",
           component: HeadOfFamilyView,
           meta: { requiresAuth: true, permission: "head-of-family-list" },
+        },
+        {
+          path: "head-of-family/create",
+          name: "create-head-of-family",
+          component: HeadOfFamilyCreateView,
+          meta: { requiresAuth: true, permission: "head-of-family-create" },
         },
       ],
     },

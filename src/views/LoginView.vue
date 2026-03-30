@@ -75,11 +75,8 @@ const handleSubmit = async () => {
   <form @submit.prevent="handleSubmit" novalidate class="flex items-center justify-center flex-1">
     <div class="flex flex-col h-fit w-fit shrink-0 rounded-3xl p-6 gap-6 bg-white">
       <header class="flex flex-col items-center">
-        <img
-          src="@/assets/images/logos/logo-text.svg"
-          alt="icon"
-          class="shrink-0 h-[38px] w-[200px] object-contain mb-8"
-        />
+        <img src="@/assets/images/logos/logo-text.svg" alt="icon"
+          class="shrink-0 h-[38px] w-[200px] object-contain mb-8" />
       </header>
       <div class="flex flex-col gap-2">
         <h1 class="font-semibold text-[20px] leading-[28px] text-center">
@@ -93,72 +90,40 @@ const handleSubmit = async () => {
         <section id="Select" class="grid grid-cols-2 gap-4 relative">
           <div
             class="group relative flex items-center justify-between p-4 rounded-xl bg-white ring-[1px] ring-desa-background hover:bg-desa-foreshadow has-[:checked]:bg-desa-foreshadow has-[:checked]:ring-desa-dark-green transition-all duration-300"
-            :class="{ 'ring-red-500': validationErrors.role && !form.role }"
-          >
-            <input
-              id="Kepala-Desa"
-              required
-              type="radio"
-              name="role"
-              v-model="form.role"
-              value="kepala_desa"
-              class="peer absolute left-0 right-0 top-0 bottom-0 z-50 opacity-0 cursor-pointer"
-            />
-            <p
-              class="font-medium text-sm leading-5 text-desa-secondary group-hover:text-desa-dark-green group-has-[:checked]:text-desa-dark-green transition-all duration-300"
+            :class="{ 'ring-red-500': validationErrors.role && !form.role }">
+            <input id="Kepala-Desa" required type="radio" name="role" v-model="form.role" value="kepala_desa"
+              class="peer absolute left-0 right-0 top-0 bottom-0 z-50 opacity-0 cursor-pointer" />
+            <p class="font-medium text-sm leading-5 text-desa-secondary group-hover:text-desa-dark-green group-has-[:checked]:text-desa-dark-green transition-all duration-300"
               :class="{
                 'text-desa-red group-hover:text-desa-red group-has-[:checked]:text-desa-red':
                   validationErrors.role && !form.role,
-              }"
-            >
+              }">
               Kepala Desa
             </p>
             <div class="relative">
-              <img
-                src="@/assets/images/icons/crown-secondary-green.svg"
-                alt="icon"
-                class="shrink-0 h-[20px] w-[20px] group-hover:opacity-0 group-has-[:checked]:opacity-0 absolute transition-all duration-300"
-              />
-              <img
-                src="@/assets/images/icons/crown-dark-green.svg"
-                alt="icon"
-                class="shrink-0 h-[20px] w-[20px] group-hover:opacity-100 group-has-[:checked]:opacity-100 opacity-0 transition-all duration-300"
-              />
+              <img src="@/assets/images/icons/crown-secondary-green.svg" alt="icon"
+                class="shrink-0 h-[20px] w-[20px] group-hover:opacity-0 group-has-[:checked]:opacity-0 absolute transition-all duration-300" />
+              <img src="@/assets/images/icons/crown-dark-green.svg" alt="icon"
+                class="shrink-0 h-[20px] w-[20px] group-hover:opacity-100 group-has-[:checked]:opacity-100 opacity-0 transition-all duration-300" />
             </div>
           </div>
           <div
             class="group relative flex items-center justify-between p-4 rounded-xl bg-white ring-[1px] ring-desa-background hover:bg-desa-foreshadow has-[:checked]:bg-desa-foreshadow has-[:checked]:ring-desa-dark-green transition-all duration-300"
-            :class="{ 'ring-red-500': validationErrors.role && !form.role }"
-          >
-            <input
-              id="Kepala-Rumah"
-              required
-              type="radio"
-              name="role"
-              v-model="form.role"
-              value="kepala_rumah"
-              class="peer absolute left-0 right-0 top-0 bottom-0 z-50 opacity-0 cursor-pointer"
-            />
-            <p
-              class="font-medium text-sm leading-5 text-desa-secondary group-hover:text-desa-dark-green group-has-[:checked]:text-desa-dark-green transition-all duration-300"
+            :class="{ 'ring-red-500': validationErrors.role && !form.role }">
+            <input id="Kepala-Rumah" required type="radio" name="role" v-model="form.role" value="kepala_rumah"
+              class="peer absolute left-0 right-0 top-0 bottom-0 z-50 opacity-0 cursor-pointer" />
+            <p class="font-medium text-sm leading-5 text-desa-secondary group-hover:text-desa-dark-green group-has-[:checked]:text-desa-dark-green transition-all duration-300"
               :class="{
                 'text-desa-red group-hover:text-desa-red group-has-[:checked]:text-desa-red':
                   validationErrors.role && !form.role,
-              }"
-            >
+              }">
               Kepala Rumah
             </p>
             <div class="relative">
-              <img
-                src="@/assets/images/icons/profile-circle-secondary-green.svg"
-                alt="icon"
-                class="shrink-0 h-[20px] w-[20px] group-hover:opacity-0 group-has-[:checked]:opacity-0 absolute transition-all duration-300"
-              />
-              <img
-                src="@/assets/images/icons/profile-circle-dark-green.svg"
-                alt="icon"
-                class="shrink-0 h-[20px] w-[20px] group-hover:opacity-100 group-has-[:checked]:opacity-100 opacity-0 transition-all duration-300"
-              />
+              <img src="@/assets/images/icons/profile-circle-secondary-green.svg" alt="icon"
+                class="shrink-0 h-[20px] w-[20px] group-hover:opacity-0 group-has-[:checked]:opacity-0 absolute transition-all duration-300" />
+              <img src="@/assets/images/icons/profile-circle-dark-green.svg" alt="icon"
+                class="shrink-0 h-[20px] w-[20px] group-hover:opacity-100 group-has-[:checked]:opacity-100 opacity-0 transition-all duration-300" />
             </div>
           </div>
         </section>
@@ -169,38 +134,24 @@ const handleSubmit = async () => {
 
       <section id="Inputs" class="flex flex-col gap-2">
         <div id="Email-Address" class="flex flex-col gap-2">
-          <h2
-            class="font-medium text-sm leading-5 text-desa-secondary"
-            :class="{ 'text-desa-red': validationErrors.email || error?.email }"
-          >
+          <h2 class="font-medium text-sm leading-5 text-desa-secondary"
+            :class="{ 'text-desa-red': validationErrors.email || error?.email }">
             Email Address
           </h2>
 
-          <Input
-            v-model="form.email"
-            type="email"
-            placeholder="Ketik Email Kamu"
-            :error-message="validationErrors.email || error?.email"
-            :icon="IconProfileSecondaryGreen"
-            :filled-icon="IconProfileBlack"
-          />
+          <Input v-model="form.email" type="email" placeholder="Ketik Email Kamu"
+            :error-message="validationErrors.email || error?.email" :icon="IconProfileSecondaryGreen"
+            :filled-icon="IconProfileBlack" />
         </div>
         <div id="Password" class="flex flex-col gap-2">
-          <h2
-            class="font-medium text-sm leading-5 text-desa-secondary"
-            :class="{ 'text-desa-red': validationErrors.password || error?.password }"
-          >
+          <h2 class="font-medium text-sm leading-5 text-desa-secondary"
+            :class="{ 'text-desa-red': validationErrors.password || error?.password }">
             Password
           </h2>
 
-          <Input
-            v-model="form.password"
-            type="password"
-            placeholder="Ketik Password Kamu"
-            :error-message="validationErrors.password || error?.password"
-            :icon="IconKeySecondaryGreen"
-            :filled-icon="IconKeyBlack"
-          />
+          <Input v-model="form.password" type="password" placeholder="Ketik Password Kamu"
+            :error-message="validationErrors.password || error?.password" :icon="IconKeySecondaryGreen"
+            :filled-icon="IconKeyBlack" />
         </div>
       </section>
 
@@ -210,11 +161,8 @@ const handleSubmit = async () => {
   <section id="Banner" class="relative flex w-full max-w-[634px]">
     <div class="fixed top-0 h-screen w-full max-w-[634px] overflow-hidden pr-3 py-3">
       <div class="h-full w-[622px] rounded-3xl gradient-vertical pt-[59px] pb-[60px]">
-        <img
-          src="@/assets/images/backgrounds/bg-signin.png"
-          class="h-full w-[542px] object-contain mx-auto"
-          alt="banner"
-        />
+        <img src="@/assets/images/backgrounds/bg-signin.png" class="h-full w-[542px] object-contain mx-auto"
+          alt="banner" />
       </div>
     </div>
   </section>
