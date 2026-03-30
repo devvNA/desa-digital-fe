@@ -258,19 +258,24 @@ onBeforeUnmount(() => {
     <template v-if="isInitialLoading">
       <div class="flex gap-[14px]">
         <div
-          class="dashboard-skeleton gradient-vertical h-[358px] w-[calc(389/1000*100%)] rounded-2xl p-6"
+          class="dashboard-skeleton dashboard-skeleton-hero gradient-vertical h-[358px] w-[calc(389/1000*100%)] rounded-2xl p-6"
         >
-          <div class="skeleton-block mb-8 h-[86px] w-[86px] rounded-[28px]"></div>
+          <div class="skeleton-block skeleton-soft mb-8 h-[86px] w-[86px] rounded-[28px]"></div>
           <div class="space-y-3">
-            <div class="skeleton-block h-4 w-28 rounded-full"></div>
-            <div class="skeleton-block h-8 w-4/5 rounded-xl"></div>
-            <div class="skeleton-block h-4 w-full rounded-full"></div>
-            <div class="skeleton-block h-4 w-3/4 rounded-full"></div>
+            <div class="skeleton-block skeleton-soft h-4 w-28 rounded-full"></div>
+            <div class="skeleton-block skeleton-soft h-8 w-4/5 rounded-xl"></div>
+            <div class="skeleton-block skeleton-soft h-4 w-full rounded-full"></div>
+            <div class="skeleton-block skeleton-soft h-4 w-3/4 rounded-full"></div>
           </div>
-          <div class="skeleton-block mt-10 h-[58px] w-full rounded-2xl bg-white/45"></div>
+          <div class="skeleton-block skeleton-soft mt-10 h-[58px] w-full rounded-2xl bg-white/35"></div>
         </div>
         <section class="grid grid-cols-2 flex-1 shrink-0 gap-[14px]">
-          <div v-for="item in 4" :key="item" class="dashboard-skeleton rounded-2xl bg-white p-6">
+          <div
+            v-for="(item, index) in 4"
+            :key="item"
+            class="dashboard-skeleton dashboard-skeleton-card rounded-2xl bg-white p-6"
+            :style="{ '--skeleton-delay': `${index * 120}ms` }"
+          >
             <div class="mb-6 flex items-center justify-between">
               <div class="skeleton-block h-4 w-28 rounded-full"></div>
               <div class="skeleton-block size-12 rounded-2xl"></div>
@@ -279,19 +284,28 @@ onBeforeUnmount(() => {
               <div class="skeleton-block h-9 w-24 rounded-xl"></div>
               <div class="skeleton-block h-4 w-36 rounded-full"></div>
             </div>
+            <div class="mt-6 flex gap-2">
+              <div class="skeleton-block h-2 w-12 rounded-full"></div>
+              <div class="skeleton-block h-2 w-20 rounded-full"></div>
+            </div>
           </div>
         </section>
       </div>
 
       <div class="grid grid-cols-[1.05fr,1fr] gap-[14px]">
-        <div class="dashboard-skeleton rounded-2xl bg-white p-6">
+        <div class="dashboard-skeleton dashboard-skeleton-card rounded-2xl bg-white p-6">
           <div class="mb-6 flex items-center justify-between">
             <div class="skeleton-block h-4 w-32 rounded-full"></div>
             <div class="skeleton-block size-12 rounded-2xl"></div>
           </div>
           <div class="skeleton-block mb-4 h-9 w-28 rounded-xl"></div>
           <div class="space-y-4">
-            <div v-for="item in 4" :key="`social-${item}`" class="flex items-center gap-3">
+            <div
+              v-for="(item, index) in 4"
+              :key="`social-${item}`"
+              class="flex items-center gap-3"
+              :style="{ '--skeleton-delay': `${index * 140}ms` }"
+            >
               <div class="skeleton-block size-[72px] rounded-2xl"></div>
               <div class="flex-1 space-y-2">
                 <div class="skeleton-block h-5 w-2/3 rounded-full"></div>
@@ -301,25 +315,30 @@ onBeforeUnmount(() => {
             </div>
           </div>
         </div>
-        <div class="dashboard-skeleton rounded-2xl bg-white p-6">
+        <div class="dashboard-skeleton dashboard-skeleton-card rounded-2xl bg-white p-6">
           <div class="mb-6 flex items-center justify-between">
             <div class="skeleton-block h-4 w-32 rounded-full"></div>
             <div class="skeleton-block size-12 rounded-2xl"></div>
           </div>
           <div class="skeleton-block mb-4 h-20 w-full rounded-2xl"></div>
-          <div class="skeleton-block h-[365px] w-full rounded-2xl"></div>
+          <div class="skeleton-block skeleton-media h-[365px] w-full rounded-2xl"></div>
         </div>
       </div>
 
       <div class="grid grid-cols-[1.35fr,1fr] gap-[14px]">
-        <div class="dashboard-skeleton rounded-2xl bg-white p-6">
+        <div class="dashboard-skeleton dashboard-skeleton-card rounded-2xl bg-white p-6">
           <div class="mb-6 flex items-center justify-between">
             <div class="skeleton-block h-4 w-32 rounded-full"></div>
             <div class="skeleton-block size-12 rounded-2xl"></div>
           </div>
           <div class="skeleton-block mb-6 h-9 w-24 rounded-xl"></div>
           <div class="space-y-4">
-            <div v-for="item in 3" :key="`applicant-${item}`" class="flex items-center gap-3">
+            <div
+              v-for="(item, index) in 3"
+              :key="`applicant-${item}`"
+              class="flex items-center gap-3"
+              :style="{ '--skeleton-delay': `${index * 160}ms` }"
+            >
               <div class="skeleton-block size-[72px] rounded-2xl"></div>
               <div class="flex-1 space-y-2">
                 <div class="skeleton-block h-5 w-1/2 rounded-full"></div>
@@ -329,17 +348,18 @@ onBeforeUnmount(() => {
             </div>
           </div>
         </div>
-        <div class="dashboard-skeleton rounded-2xl bg-white p-6">
+        <div class="dashboard-skeleton dashboard-skeleton-card rounded-2xl bg-white p-6">
           <div class="mb-6 flex items-center justify-between">
             <div class="skeleton-block h-4 w-36 rounded-full"></div>
             <div class="skeleton-block size-12 rounded-2xl"></div>
           </div>
-          <div class="mx-auto mb-6 skeleton-block size-[288px] rounded-full"></div>
+          <div class="mx-auto mb-6 skeleton-ring size-[288px] rounded-full"></div>
           <div class="space-y-4">
             <div
-              v-for="item in 4"
+              v-for="(item, index) in 4"
               :key="`segment-${item}`"
               class="flex items-center justify-between"
+              :style="{ '--skeleton-delay': `${index * 110}ms` }"
             >
               <div class="space-y-2">
                 <div class="skeleton-block h-4 w-20 rounded-full"></div>
@@ -997,16 +1017,61 @@ onBeforeUnmount(() => {
 .dashboard-skeleton {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+}
+
+.dashboard-skeleton-card {
+  background:
+    radial-gradient(circle at top right, rgba(142, 189, 85, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 248, 0.94));
+  box-shadow: 0 16px 40px rgba(38, 58, 42, 0.05);
+}
+
+.dashboard-skeleton-hero {
+  box-shadow: 0 22px 44px rgba(52, 97, 58, 0.18);
 }
 
 .skeleton-block {
   position: relative;
   overflow: hidden;
-  background: rgba(111, 132, 121, 0.12);
+  background: linear-gradient(180deg, rgba(111, 132, 121, 0.16), rgba(111, 132, 121, 0.09));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.skeleton-soft {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.16));
+}
+
+.skeleton-media {
+  background:
+    linear-gradient(135deg, rgba(142, 189, 85, 0.14), rgba(52, 97, 58, 0.08)),
+    linear-gradient(180deg, rgba(111, 132, 121, 0.12), rgba(111, 132, 121, 0.08));
+}
+
+.skeleton-ring {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0) 42%, rgba(111, 132, 121, 0.14) 43%, rgba(111, 132, 121, 0.14) 56%, rgba(255, 255, 255, 0) 57%),
+    conic-gradient(from 120deg, rgba(52, 97, 58, 0.12), rgba(142, 189, 85, 0.22), rgba(250, 113, 57, 0.18), rgba(251, 173, 72, 0.2), rgba(52, 97, 58, 0.12));
+  box-shadow: inset 0 0 0 1px rgba(111, 132, 121, 0.08);
+}
+
+.skeleton-ring::before {
+  content: '';
+  position: absolute;
+  inset: 50%;
+  width: 108px;
+  height: 108px;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 24px rgba(38, 58, 42, 0.06);
 }
 
 .skeleton-block::after,
-.dashboard-skeleton::after {
+.dashboard-skeleton::after,
+.skeleton-ring::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -1014,14 +1079,27 @@ onBeforeUnmount(() => {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.08) 12%,
+    rgba(255, 255, 255, 0.58) 50%,
+    rgba(255, 255, 255, 0.08) 88%,
     transparent 100%
   );
-  animation: shimmer 1.6s ease-in-out infinite;
+  animation: shimmer 1.9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: var(--skeleton-delay, 0ms);
 }
 
 .loading-dot {
   animation: pulse 1.2s ease-in-out infinite;
+}
+
+.dashboard-skeleton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.32), transparent 35%);
+  opacity: 0.85;
 }
 
 @keyframes shimmer {

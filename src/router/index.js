@@ -5,6 +5,8 @@ import AuthLayout from "@/layouts/AuthLayout.vue";
 import MainLayout from "@/layouts/MainLayout.vue";
 
 const DashboardView = () => import("@/views/DashboardView.vue");
+const HeadOfFamiliesView = () => import("@/views/head-of-family/HeadOfFamiliesView.vue");
+const HeadOfFamilyView = () => import("@/views/head-of-family/HeadOfFamilyView.vue");
 const LoginView = () => import("@/views/LoginView.vue");
 
 const router = createRouter({
@@ -19,6 +21,18 @@ const router = createRouter({
           name: "dashboard",
           component: DashboardView,
           meta: { requiresAuth: true, permission: "dashboard-menu" },
+        },
+        {
+          path: "head-of-family",
+          name: "head-of-family",
+          component: HeadOfFamiliesView,
+          meta: { requiresAuth: true, permission: "head-of-family-list" },
+        },
+        {
+          path: "head-of-family/:id",
+          name: "manage-head-of-family",
+          component: HeadOfFamilyView,
+          meta: { requiresAuth: true, permission: "head-of-family-list" },
         },
       ],
     },
