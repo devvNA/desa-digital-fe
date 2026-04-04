@@ -18,6 +18,8 @@ const SocialAssistanceEditView = () =>
     import("@/views/social-assistance/SocialAssistanceEditView.vue");
 const SocialAssistanceRecipientsView = () =>
     import("@/views/social-assistance-recipient/SocialAssistanceRecipientsView.vue");
+const SocialAssistanceRecipientDetailView = () =>
+    import("@/views/social-assistance-recipient/SocialAssistanceRecipientDetailView.vue");
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -78,6 +80,12 @@ const router = createRouter({
                     path: "social-assistance-recipient",
                     name: "social-assistance-recipient",
                     component: SocialAssistanceRecipientsView,
+                    meta: { requiresAuth: true, permission: "social-assistance-recipient-list" },
+                },
+                {
+                    path: "social-assistance-recipient/:id",
+                    name: "manage-social-assistance-recipient",
+                    component: SocialAssistanceRecipientDetailView,
                     meta: { requiresAuth: true, permission: "social-assistance-recipient-list" },
                 },
             ],

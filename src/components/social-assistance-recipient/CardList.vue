@@ -90,14 +90,19 @@ function getStatusConfig(status) {
 
 <template>
     <template v-if="!loading">
-        <div v-for="item in socialAssistanceRecipients" :key="item.id" class="card flex flex-col gap-4 rounded-3xl p-6 bg-white">
+        <div v-for="item in socialAssistanceRecipients" :key="item.id"
+            class="card flex flex-col gap-4 rounded-3xl p-6 bg-white">
             <div class="flex items-center justify-between gap-4">
                 <p class="flex items-center gap-1 min-w-0">
-                    <img src="@/assets/images/icons/calendar-2-secondary-green.svg" class="flex size-[18px] shrink-0" alt="icon">
-                    <span class="font-medium text-sm text-desa-secondary truncate">{{ formatCreatedAt(item.created_at) }}</span>
+                    <img src="@/assets/images/icons/calendar-2-secondary-green.svg" class="flex size-[18px] shrink-0"
+                        alt="icon">
+                    <span class="font-medium text-sm text-desa-secondary truncate">{{ formatCreatedAt(item.created_at)
+                    }}</span>
                 </p>
-                <div class="badge rounded-full p-3 gap-2 flex w-[100px] justify-center shrink-0" :class="getStatusConfig(item.status).className">
-                    <span class="font-semibold text-xs text-white uppercase">{{ getStatusConfig(item.status).label }}</span>
+                <div class="badge rounded-full p-3 gap-2 flex w-[100px] justify-center shrink-0"
+                    :class="getStatusConfig(item.status).className">
+                    <span class="font-semibold text-xs text-white uppercase">{{ getStatusConfig(item.status).label
+                    }}</span>
                 </div>
             </div>
 
@@ -105,21 +110,28 @@ function getStatusConfig(status) {
 
             <div class="flex items-center w-full gap-6">
                 <div class="flex w-[100px] h-20 shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
-                    <img :src="getThumbnail(item.social_assistance?.thumbnail)" class="w-full h-full object-cover" alt="thumbnail" @error="handleImageError($event, fallbackThumbnail)">
+                    <img :src="getThumbnail(item.social_assistance?.thumbnail)" class="w-full h-full object-cover"
+                        alt="thumbnail" @error="handleImageError($event, fallbackThumbnail)">
                 </div>
                 <div class="flex flex-col gap-[6px] w-full min-w-0">
-                    <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">{{ item.social_assistance?.name || '-' }}</p>
+                    <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">{{ item.social_assistance?.name ||
+                        '-' }}</p>
                     <p class="flex items-center gap-1 min-w-0">
-                        <img src="@/assets/images/icons/briefcase-secondary-green.svg" class="flex size-[18px] shrink-0" alt="icon">
-                        <span class="font-medium text-sm text-desa-secondary truncate">{{ item.social_assistance?.provider || '-' }}</span>
+                        <img src="@/assets/images/icons/briefcase-secondary-green.svg" class="flex size-[18px] shrink-0"
+                            alt="icon">
+                        <span class="font-medium text-sm text-desa-secondary truncate">{{
+                            item.social_assistance?.provider || '-' }}</span>
                     </p>
                 </div>
                 <div class="flex items-center gap-3 shrink-0">
                     <div class="flex flex-col gap-1 text-right">
-                        <p class="font-semibold text-lg leading-5 text-desa-dark-green text-nowrap">{{ formatRupiah(item.social_assistance?.amount || 0) }}</p>
-                        <p class="font-medium text-sm text-desa-secondary">{{ formatCategory(item.social_assistance?.category) }}</p>
+                        <p class="font-semibold text-lg leading-5 text-desa-dark-green text-nowrap">{{
+                            formatRupiah(item.social_assistance?.amount || 0) }}</p>
+                        <p class="font-medium text-sm text-desa-secondary">{{
+                            formatCategory(item.social_assistance?.category) }}</p>
                     </div>
-                    <div class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
+                    <div
+                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
                         <img src="@/assets/images/icons/money-dark-green.svg" class="flex size-6 shrink-0" alt="icon">
                     </div>
                 </div>
@@ -130,33 +142,44 @@ function getStatusConfig(status) {
             <div class="flex items-center gap-6 justify-between">
                 <div class="flex items-center gap-3 w-[302px] shrink-0 min-w-0">
                     <div class="flex size-[54px] rounded-full bg-desa-foreshadow overflow-hidden shrink-0">
-                        <img :src="getProfilePicture(item.head_of_family?.profile_picture)" class="w-full h-full object-cover" alt="photo" @error="handleImageError($event, fallbackProfilePicture)">
+                        <img :src="getProfilePicture(item.head_of_family?.profile_picture)"
+                            class="w-full h-full object-cover" alt="photo"
+                            @error="handleImageError($event, fallbackProfilePicture)">
                     </div>
                     <div class="flex flex-col gap-1 min-w-0">
-                        <p class="font-semibold text-lg leading-5 text-desa-black truncate">{{ item.head_of_family?.user?.name || '-' }}</p>
+                        <p class="font-semibold text-lg leading-5 text-desa-black truncate">{{
+                            item.head_of_family?.user?.name || '-' }}</p>
                         <p class="flex items-center gap-1 min-w-0">
-                            <img src="@/assets/images/icons/briefcase-secondary-green.svg" class="flex size-[18px] shrink-0" alt="icon">
-                            <span class="font-medium text-sm text-desa-secondary truncate">{{ item.head_of_family?.occupation || '-' }}</span>
+                            <img src="@/assets/images/icons/briefcase-secondary-green.svg"
+                                class="flex size-[18px] shrink-0" alt="icon">
+                            <span class="font-medium text-sm text-desa-secondary truncate">{{
+                                item.head_of_family?.occupation || '-' }}</span>
                         </p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3 w-[302px] shrink-0">
-                    <div class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                        <img src="@/assets/images/icons/receive-square-2-dark-green.svg" class="flex size-6 shrink-0" alt="icon">
+                    <div
+                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
+                        <img src="@/assets/images/icons/receive-square-2-dark-green.svg" class="flex size-6 shrink-0"
+                            alt="icon">
                     </div>
                     <div class="flex flex-col gap-1">
-                        <p class="font-semibold text-lg leading-5 text-desa-dark-green text-nowrap">{{ formatRupiah(item.amount || 0) }}</p>
+                        <p class="font-semibold text-lg leading-5 text-desa-dark-green text-nowrap">{{
+                            formatRupiah(item.amount || 0) }}</p>
                         <p class="font-medium text-sm text-desa-secondary">Nominal Pengajuan</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3 justify-end w-[252px] shrink-0">
-                    <RouterLink v-if="item.social_assistance?.id" :to="{ name: 'manage-social-assistance', params: { id: item.social_assistance.id } }" class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
+                    <RouterLink v-if="item.id"
+                        :to="{ name: 'manage-social-assistance-recipient', params: { id: item.id } }"
+                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
                         <span class="font-medium text-white" v-if="user?.role === 'admin'">Kelola Bansos</span>
                         <span class="font-medium text-white" v-else>Lihat Bansos</span>
                     </RouterLink>
-                    <div v-else class="rounded-2xl bg-desa-foreshadow px-4 py-3 text-sm font-medium text-desa-secondary">
+                    <div v-else
+                        class="rounded-2xl bg-desa-foreshadow px-4 py-3 text-sm font-medium text-desa-secondary">
                         Data bantuan tidak tersedia
                     </div>
                 </div>
@@ -169,7 +192,8 @@ function getStatusConfig(status) {
     </template>
 
     <div v-else class="flex flex-col gap-[14px]">
-        <div v-for="index in skeletonRows" :key="index" class="sar-skeleton-card rounded-3xl p-6" :style="{ '--skeleton-delay': `${index * 90}ms` }">
+        <div v-for="index in skeletonRows" :key="index" class="sar-skeleton-card rounded-3xl p-6"
+            :style="{ '--skeleton-delay': `${index * 90}ms` }">
             <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-2 min-w-[220px]">
                     <div class="sar-skeleton-block size-[18px] rounded-full"></div>

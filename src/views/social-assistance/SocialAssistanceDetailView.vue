@@ -116,9 +116,10 @@ onMounted(() => {
         <div id="Header" class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
                 <div class="flex gap-1 items-center leading-5 text-desa-secondary">
-                    <p class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize">
+                    <RouterLink :to="{ name: 'social-assistance' }"
+                        class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize hover:text-desa-dark-green transition-colors">
                         Bantuan
-                        sosial</p>
+                        sosial</RouterLink>
                     <span>/</span>
                     <p class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize">
                         Manage
@@ -171,7 +172,7 @@ onMounted(() => {
                         :class="detail.is_available ? 'bg-desa-soft-green' : 'bg-desa-red'">
                         <span class="font-semibold text-xs text-white uppercase">{{
                             formatAvailability(detail.is_available)
-                        }}</span>
+                            }}</span>
                     </div>
                 </div>
                 <div class="flex flex-col gap-[6px] w-full">
@@ -228,7 +229,7 @@ onMounted(() => {
                 <div class="flex flex-col gap-3">
                     <p class="font-medium text-sm text-desa-secondary">Tentang Bantuan</p>
                     <p class="font-medium leading-8">{{ detail.description || 'Tidak ada deskripsi bantuan sosial.'
-                        }}</p>
+                    }}</p>
                 </div>
             </section>
             <section id="Penerima-Bansos-Terakhir"
@@ -261,7 +262,7 @@ onMounted(() => {
                                 :class="getStatusConfig(recipient.status).className">
                                 <span class="font-semibold text-xs text-white uppercase">{{
                                     getStatusConfig(recipient.status).label
-                                }}</span>
+                                    }}</span>
                             </div>
                         </div>
                         <hr class="border-desa-background" />
