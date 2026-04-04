@@ -14,4 +14,3 @@ import SidebarComponent from '@/components/sidebar/SidebarComponent.vue';
     </main>
   </div>
 </template>
- 
