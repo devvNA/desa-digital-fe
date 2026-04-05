@@ -4,17 +4,15 @@ import { formatRupiah, parseRupiah } from '@/helpers/format'
 import {
     fallbackProfilePicture,
     fallbackThumbnail,
-    formatAvailability,
     formatCategory,
     formatCreatedAt,
     formatRecipientsCount,
-    getAvailabilityConfig,
     getBankLogo,
     getProfilePicture,
     getStatusConfig,
     getThumbnail,
     handleImageError,
-    proofPlaceholder,
+    proofPlaceholder
 } from '@/helpers/socialAssistance'
 import { useSocialAssistanceRecipientStore } from '@/stores/socialAssistanceRecipient'
 import { storeToRefs } from 'pinia'
@@ -60,7 +58,6 @@ const socialAssistance = computed(() => detail.value.social_assistance ?? {})
 const headOfFamily = computed(() => detail.value.head_of_family ?? {})
 const headOfFamilyUser = computed(() => headOfFamily.value.user ?? {})
 const statusConfig = computed(() => getStatusConfig(detail.value.status))
-const availabilityConfig = computed(() => getAvailabilityConfig(socialAssistance.value.is_available))
 const bankLogo = computed(() => getBankLogo(detail.value.bank))
 
 const proofImage = computed(() => {
@@ -220,9 +217,8 @@ onBeforeUnmount(() => {
                     value-class="text-desa-dark-green leading-[22.5px]" />
 
                 <hr class="border-desa-foreshadow">
-                <InfoRow :icon="iconMinusSquare" :value="formatAvailability(socialAssistance.is_available)"
-                    label="Ketersediaan Bantuan" :value-class="`leading-[22.5px] ${availabilityConfig.textClassName}`"
-                    :icon-box-class="availabilityConfig.className" />
+                <InfoRow :icon="iconMinusSquare" :value="formatRupiah(9200000)" label="Sisa Bansos"
+                    value-class="text-desa-red leading-[22.5px]" icon-box-class="bg-desa-red/10" />
 
                 <hr class="border-desa-foreshadow">
                 <InfoRow :icon="iconProfile2User" :value="formatRecipientsCount(socialAssistance.recipients_count)"

@@ -20,6 +20,9 @@ const SocialAssistanceRecipientsView = () =>
     import("@/views/social-assistance-recipient/SocialAssistanceRecipientsView.vue");
 const SocialAssistanceRecipientDetailView = () =>
     import("@/views/social-assistance-recipient/SocialAssistanceRecipientDetailView.vue");
+const DevelopmentsView = () => import("@/views/development/developmentsView.vue");
+const EventsView = () => import("@/views/event/eventsView.vue");
+const ProfileView = () => import("@/views/profile/ProfileView.vue");
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -88,6 +91,24 @@ const router = createRouter({
                     component: SocialAssistanceRecipientDetailView,
                     meta: { requiresAuth: true, permission: "social-assistance-recipient-list" },
                 },
+                {
+                    path: "development",
+                    name: "development",
+                    component: DevelopmentsView,
+                    meta: { requiresAuth: true, permission: "development-list" },
+                },
+                {
+                    path: "event",
+                    name: "event",
+                    component: EventsView,
+                    meta: { requiresAuth: true, permission: "event-list" },
+                },
+                {
+                    path: "profile",
+                    name: "profile",
+                    component: ProfileView,
+                    meta: { requiresAuth: true, permission: "profile-menu" },
+                },
             ],
         },
         {
@@ -133,3 +154,51 @@ router.beforeEach(async (to) => {
 });
 
 export default router;
+
+/* "permissions": [
+      "dashboard-menu",
+      "head-of-family-menu",
+      "head-of-family-list",
+      "head-of-family-create",
+      "head-of-family-edit",
+      "head-of-family-delete",
+      "family-member-menu",
+      "family-member-list",
+      "family-member-create",
+      "family-member-edit",
+      "family-member-delete",
+      "social-assistance-menu",
+      "social-assistance-list",
+      "social-assistance-create",
+      "social-assistance-edit",
+      "social-assistance-delete",
+      "social-assistance-recipient-menu",
+      "social-assistance-recipient-list",
+      "social-assistance-recipient-create",
+      "social-assistance-recipient-edit",
+      "social-assistance-recipient-delete",
+      "event-menu",
+      "event-list",
+      "event-create",
+      "event-edit",
+      "event-delete",
+      "event-participant-menu",
+      "event-participant-list",
+      "event-participant-create",
+      "event-participant-edit",
+      "event-participant-delete",
+      "development-menu",
+      "development-list",
+      "development-create",
+      "development-edit",
+      "development-delete",
+      "development-applicant-menu",
+      "development-applicant-list",
+      "development-applicant-create",
+      "development-applicant-edit",
+      "development-applicant-delete",
+      "profile-menu",
+      "profile-create",
+      "profile-edit"
+    ],
+    "role": "admin" */
