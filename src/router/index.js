@@ -20,8 +20,11 @@ const SocialAssistanceRecipientsView = () =>
     import("@/views/social-assistance-recipient/SocialAssistanceRecipientsView.vue");
 const SocialAssistanceRecipientDetailView = () =>
     import("@/views/social-assistance-recipient/SocialAssistanceRecipientDetailView.vue");
-const DevelopmentsView = () => import("@/views/development/developmentsView.vue");
-const EventsView = () => import("@/views/event/eventsView.vue");
+const DevelopmentsView = () => import("@/views/development/DevelopmentsView.vue");
+const DevelopmentDetailView = () => import("@/views/development/DevelopmentDetailView.vue");
+const DevelopmentCreateView = () => import("@/views/development/DevelopmentCreateView.vue");
+const DevelopmentEditView = () => import("@/views/development/DevelopmentEditView.vue");
+const EventsView = () => import("@/views/event/EventsView.vue");
 const ProfileView = () => import("@/views/profile/ProfileView.vue");
 
 const router = createRouter({
@@ -98,10 +101,28 @@ const router = createRouter({
                     meta: { requiresAuth: true, permission: "development-list" },
                 },
                 {
+                    path: "development/:id",
+                    name: "manage-development",
+                    component: DevelopmentDetailView,
+                    meta: { requiresAuth: true, permission: "development-list" },
+                },
+                {
                     path: "event",
                     name: "event",
                     component: EventsView,
                     meta: { requiresAuth: true, permission: "event-list" },
+                },
+                {
+                    path: "development/create",
+                    name: "create-development",
+                    component: DevelopmentCreateView,
+                    meta: { requiresAuth: true, permission: "development-create" },
+                },
+                {
+                    path: "development/edit/:id",
+                    name: "edit-development",
+                    component: DevelopmentEditView,
+                    meta: { requiresAuth: true, permission: "development-edit" },
                 },
                 {
                     path: "profile",
