@@ -25,6 +25,9 @@ const DevelopmentDetailView = () => import("@/views/development/DevelopmentDetai
 const DevelopmentCreateView = () => import("@/views/development/DevelopmentCreateView.vue");
 const DevelopmentEditView = () => import("@/views/development/DevelopmentEditView.vue");
 const EventsView = () => import("@/views/event/EventsView.vue");
+const EventCreateView = () => import("@/views/event/EventCreateView.vue");
+const EventEditView = () => import("@/views/event/EventEditView.vue");
+const EventDetailView = () => import("@/views/event/EventDetailView.vue");
 const ProfileView = () => import("@/views/profile/ProfileView.vue");
 
 const router = createRouter({
@@ -107,12 +110,6 @@ const router = createRouter({
                     meta: { requiresAuth: true, permission: "development-list" },
                 },
                 {
-                    path: "event",
-                    name: "event",
-                    component: EventsView,
-                    meta: { requiresAuth: true, permission: "event-list" },
-                },
-                {
                     path: "development/create",
                     name: "create-development",
                     component: DevelopmentCreateView,
@@ -123,6 +120,30 @@ const router = createRouter({
                     name: "edit-development",
                     component: DevelopmentEditView,
                     meta: { requiresAuth: true, permission: "development-edit" },
+                },
+                {
+                    path: "event",
+                    name: "event",
+                    component: EventsView,
+                    meta: { requiresAuth: true, permission: "event-list" },
+                },
+                {
+                    path: "event/:id",
+                    name: "manage-event",
+                    component: EventDetailView,
+                    meta: { requiresAuth: true, permission: "event-list" },
+                },
+                {
+                    path: "event/create",
+                    name: "create-event",
+                    component: EventCreateView,
+                    meta: { requiresAuth: true, permission: "event-create" },
+                },
+                {
+                    path: "event/edit/:id",
+                    name: "edit-event",
+                    component: EventEditView,
+                    meta: { requiresAuth: true, permission: "event-edit" },
                 },
                 {
                     path: "profile",

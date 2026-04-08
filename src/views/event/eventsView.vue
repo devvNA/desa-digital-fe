@@ -1,21 +1,190 @@
 <script setup>
+import CardList from '@/components/event/CardList.vue'
+import PaginationUI from '@/components/ui/PaginationUI.vue'
+import { useEventStore } from '@/stores/event'
+import { storeToRefs } from 'pinia'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const eventStore = useEventStore()
+const { events, meta, loading, success, error } = storeToRefs(eventStore)
+const { fetchEventsPaginated } = eventStore
+
+const serverOptions = ref({
+    page: 1,
+    row_per_page: 10,
+})
+
+const filters = ref({
+    search: null,
+})
+
+const searchDebounceDelay = 500
+let searchDebounceId = null
+let shouldSkipSearchWatcher = false
+
+const skeletonRows = computed(() => Math.max(4, Number(serverOptions.value.row_per_page) || 4))
+const hasEvents = computed(() => events.value.length > 0)
+const hasActiveFilters = computed(() => Boolean(filters.value.search))
+const hasCreateEventRoute = computed(() => router.hasRoute('create-event'))
+const isInitialLoading = computed(() => loading.value && !hasEvents.value)
+const isRefreshing = computed(() => loading.value && hasEvents.value)
+const emptyStateMessage = computed(() => {
+    if (hasActiveFilters.value) {
+        return 'Data event desa tidak ditemukan untuk pencarian ini.'
+    }
+
+    return 'Data event desa belum tersedia.'
+})
+const generalError = computed(() => {
+    if (typeof error.value === 'string') {
+        return error.value
+    }
+
+    if (error.value && typeof error.value === 'object') {
+        return 'Data event desa gagal dimuat.'
+    }
+
+    return null
+})
+
+const fetchData = async () => {
+    await fetchEventsPaginated({
+        ...serverOptions.value,
+        ...filters.value,
+    })
+}
+
+const normalizeSearch = () => {
+    const trimmedSearch = filters.value.search?.trim()
+    filters.value.search = trimmedSearch || null
+}
+
+const handleSearch = async () => {
+    serverOptions.value = {
+        ...serverOptions.value,
+        page: 1,
+    }
+
+    normalizeSearch()
+    await fetchData()
+}
+
+const handleUpdateServerOptions = async (options) => {
+    serverOptions.value = {
+        ...serverOptions.value,
+        ...options,
+    }
+
+    await fetchData()
+}
+
+const handlePerPageChange = async () => {
+    serverOptions.value = {
+        ...serverOptions.value,
+        page: 1,
+        row_per_page: Number(serverOptions.value.row_per_page) || 10,
+    }
+
+    await fetchData()
+}
+
+const resetFilters = async () => {
+    shouldSkipSearchWatcher = true
+
+    if (searchDebounceId) {
+        clearTimeout(searchDebounceId)
+        searchDebounceId = null
+    }
+
+    filters.value = {
+        search: null,
+    }
+
+    serverOptions.value = {
+        ...serverOptions.value,
+        page: 1,
+    }
+
+    await fetchData()
+}
+
+const scheduleSearch = () => {
+    if (searchDebounceId) {
+        clearTimeout(searchDebounceId)
+    }
+
+    searchDebounceId = setTimeout(() => {
+        handleSearch()
+    }, searchDebounceDelay)
+}
+
+watch(
+    () => filters.value.search,
+    (value, previousValue) => {
+        if (shouldSkipSearchWatcher) {
+            shouldSkipSearchWatcher = false
+            return
+        }
+
+        if (value === previousValue) {
+            return
+        }
+
+        scheduleSearch()
+    },
+)
+
+onMounted(() => {
+    fetchData()
+})
+
+onBeforeUnmount(() => {
+    if (searchDebounceId) {
+        clearTimeout(searchDebounceId)
+    }
+})
 </script>
 
 <template>
     <div class="flex flex-col gap-4">
         <div id="Header" class="flex items-center justify-between">
             <h1 class="font-semibold text-2xl">Events Desa</h1>
-            <a href="kd-event-desa-add.html"
+            <RouterLink v-if="hasCreateEventRoute" :to="{ name: 'create-event' }"
                 class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-dark-green">
                 <img src="@/assets/images/icons/add-square-white.svg" class="flex size-6 shrink-0" alt="icon">
                 <p class="font-medium text-white">Add New</p>
-            </a>
+            </RouterLink>
         </div>
         <section id="List-Event-Desa" class="flex flex-col gap-[14px]">
-            <form id="Page-Search" class="flex items-center justify-between">
+            <div v-if="success"
+                class="relative mb-4 rounded-2xl border border-green-400 bg-green-100 px-4 py-3 text-green-700"
+                role="alert">
+                <span class="block sm:inline">{{ success }}</span>
+                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2" @click="success = null">
+                    <img src="@/assets/images/icons/close-circle-secondary-green.svg" class="flex size-6 shrink-0"
+                        alt="close success alert">
+                </button>
+            </div>
+
+            <div v-if="generalError"
+                class="relative mb-4 rounded-2xl border border-red-400 bg-red-100 px-4 py-3 text-red-700" role="alert">
+                <span class="block sm:inline">{{ generalError }}</span>
+                <div class="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                    <button type="button" class="text-sm font-semibold text-red-700 underline" @click="fetchData">
+                        Coba lagi
+                    </button>
+                    <button type="button" @click="error = null">
+                        <img src="@/assets/images/icons/close-circle-white.svg" class="flex size-6 shrink-0"
+                            alt="close error alert">
+                    </button>
+                </div>
+            </div>
+            <form id="Page-Search" class="flex items-center justify-between" @submit.prevent="handleSearch">
                 <div class="flex flex-col gap-3 w-[370px] shrink-0">
                     <label class="relative group peer w-full valid">
-                        <input type="text" placeholder="Cari nama event desa"
+                        <input v-model="filters.search" type="text" placeholder="Cari nama event desa"
                             class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 pl-12 pr-6 gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300">
                         <div class="absolute transform -translate-y-1/2 top-1/2 left-4 flex size-6 shrink-0">
                             <img src="@/assets/images/icons/calendar-search-secondary-green.svg"
@@ -29,7 +198,7 @@
                     <div class="flex items-center gap-[10px]">
                         <span class="font-medium leading-5">Show</span>
                         <div class="relative">
-                            <select name="" id=""
+                            <select v-model="serverOptions.row_per_page" @change="handlePerPageChange" name="" id=""
                                 class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 px-6 pr-[52px] gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300">
                                 <option value="5" selected>5 Entries</option>
                                 <option value="10">10 Entries</option>
@@ -42,391 +211,57 @@
                                 class="flex size-6 shrink-0 absolute transform -translate-y-1/2 top-1/2 right-6"
                                 alt="icon">
                         </div>
+                        <div v-if="!isInitialLoading && !hasEvents && hasActiveFilters" class="flex justify-center">
+                            <button type="button" @click="resetFilters"
+                                class="inline-flex items-center rounded-2xl bg-desa-black px-5 py-3 text-sm font-medium text-white">
+                                Reset pencarian
+                            </button>
+                        </div>
                     </div>
-                    <button type="button"
-                        class="flex items-center gap-1 h-14 w-fit rounded-2xl border border-desa-background bg-white py-4 px-6">
-                        <img src="@/assets/images/icons/filter-black.svg" class="flex size-6 shrink-0" alt="icon">
-                        <span class="font-medium leading-5">Filter</span>
-                    </button>
                 </div>
             </form>
-            <div class="card flex flex-col gap-6 rounded-3xl p-6 bg-white">
-                <div class="flex items-center w-full">
-                    <div class="flex w-[100px] h-20 shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
-                        <img src="@/assets/images/thumbnails/kk-event-desa-1.png" class="w-full h-full object-cover"
-                            alt="photo">
-                    </div>
-                    <div class="flex flex-col gap-[6px] w-full ml-4 mr-9">
-                        <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">Belajar HTML Dasar Bersama</p>
-                        <div class="flex items-center gap-1">
-                            <img src="@/assets/images/icons/ticket-secondary-green.svg"
-                                class="flex size-[18px] shrink-0" alt="icon">
-                            <p class="font-medium text-sm text-desa-secondary">
-                                Registration:
-                                <span class="font-medium text-base text-desa-dark-green">
-                                    Open
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                    <a href="kd-event-desa-manage.html"
-                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
-                        <span class="font-medium text-white">Manage</span>
-                    </a>
-                </div>
-                <hr class="border-desa-background">
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-red/10 overflow-hidden">
-                            <img src="@/assets/images/icons/wallet-3-red.svg" class="flex size-6 shrink-0" alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-red">Rp499.000</p>
-                            <p class="font-medium text-sm text-desa-secondary">Harga Event</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-blue/10 overflow-hidden">
-                            <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-blue">15.600 Warga</p>
-                            <p class="font-medium text-sm text-desa-secondary">Total Partisipasi</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                            <img src="@/assets/images/icons/calendar-2-dark-green.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-dark-green">Mon, 24 Feb 2025</p>
-                            <p class="font-medium text-sm text-desa-secondary">Tanggal Pelaksanaan</p>
-                        </div>
-                    </div>
-                </div>
+            <div v-if="isRefreshing"
+                class="inline-flex w-fit items-center gap-2 rounded-full border border-desa-foreshadow bg-white px-4 py-2 text-sm text-desa-secondary">
+                <span class="loading-dot size-2 rounded-full bg-desa-soft-green"></span>
+                Memuat ulang data pembangunan desa
             </div>
-            <div class="card flex flex-col gap-6 rounded-3xl p-6 bg-white">
-                <div class="flex items-center w-full">
-                    <div class="flex w-[100px] h-20 shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
-                        <img src="@/assets/images/thumbnails/kk-event-desa-2.png" class="w-full h-full object-cover"
-                            alt="photo">
-                    </div>
-                    <div class="flex flex-col gap-[6px] w-full ml-4 mr-9">
-                        <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">Dari Desa ke Dunia Digital:
-                            Workshop HTML dan AI untuk Pemula</p>
-                        <div class="flex items-center gap-1">
-                            <img src="@/assets/images/icons/ticket-secondary-green.svg"
-                                class="flex size-[18px] shrink-0" alt="icon">
-                            <p class="font-medium text-sm text-desa-secondary">
-                                Registration:
-                                <span class="font-medium text-base text-desa-dark-green">
-                                    Open
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                    <a href="kd-event-desa-manage.html"
-                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
-                        <span class="font-medium text-white">Manage</span>
-                    </a>
-                </div>
-                <hr class="border-desa-background">
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-red/10 overflow-hidden">
-                            <img src="@/assets/images/icons/wallet-3-red.svg" class="flex size-6 shrink-0" alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-red">Rp499.000</p>
-                            <p class="font-medium text-sm text-desa-secondary">Harga Event</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-blue/10 overflow-hidden">
-                            <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-blue">15.600 Warga</p>
-                            <p class="font-medium text-sm text-desa-secondary">Total Partisipasi</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                            <img src="@/assets/images/icons/calendar-2-dark-green.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-dark-green">Mon, 24 Feb 2025</p>
-                            <p class="font-medium text-sm text-desa-secondary">Tanggal Pelaksanaan</p>
-                        </div>
-                    </div>
-                </div>
+
+            <CardList :events="events" :loading="isInitialLoading" :skeleton-rows="skeletonRows"
+                :empty-message="emptyStateMessage" />
+
+            <div v-if="!isInitialLoading && !hasEvents && hasActiveFilters" class="flex justify-center">
+                <button type="button" @click="resetFilters"
+                    class="inline-flex items-center rounded-2xl bg-desa-black px-5 py-3 text-sm font-medium text-white">
+                    Reset pencarian
+                </button>
             </div>
-            <div class="card flex flex-col gap-6 rounded-3xl p-6 bg-white">
-                <div class="flex items-center w-full">
-                    <div class="flex w-[100px] h-20 shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
-                        <img src="@/assets/images/thumbnails/kk-event-desa-3.png" class="w-full h-full object-cover"
-                            alt="photo">
-                    </div>
-                    <div class="flex flex-col gap-[6px] w-full ml-4 mr-9">
-                        <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">Mengenal AI: Menjelajahi Dunia
-                            Kecerdasan Buatan dengan Santai</p>
-                        <div class="flex items-center gap-1">
-                            <img src="@/assets/images/icons/ticket-secondary-green.svg"
-                                class="flex size-[18px] shrink-0" alt="icon">
-                            <p class="font-medium text-sm text-desa-secondary">
-                                Registration:
-                                <span class="font-medium text-base text-desa-dark-green">
-                                    Open
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                    <a href="kd-event-desa-manage.html"
-                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
-                        <span class="font-medium text-white">Manage</span>
-                    </a>
-                </div>
-                <hr class="border-desa-background">
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-red/10 overflow-hidden">
-                            <img src="@/assets/images/icons/wallet-3-red.svg" class="flex size-6 shrink-0" alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-red">Rp499.000</p>
-                            <p class="font-medium text-sm text-desa-secondary">Harga Event</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-blue/10 overflow-hidden">
-                            <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-blue">15.600 Warga</p>
-                            <p class="font-medium text-sm text-desa-secondary">Total Partisipasi</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                            <img src="@/assets/images/icons/calendar-2-dark-green.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-dark-green">Mon, 24 Feb 2025</p>
-                            <p class="font-medium text-sm text-desa-secondary">Tanggal Pelaksanaan</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card flex flex-col gap-6 rounded-3xl p-6 bg-white">
-                <div class="flex items-center w-full">
-                    <div class="flex w-[100px] h-20 shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
-                        <img src="@/assets/images/thumbnails/kk-event-desa-4.png" class="w-full h-full object-cover"
-                            alt="photo">
-                    </div>
-                    <div class="flex flex-col gap-[6px] w-full ml-4 mr-9">
-                        <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">Kegiatan Sehat untuk menyambut
-                            tahun baru</p>
-                        <div class="flex items-center gap-1">
-                            <img src="@/assets/images/icons/ticket-secondary-green.svg"
-                                class="flex size-[18px] shrink-0" alt="icon">
-                            <p class="font-medium text-sm text-desa-secondary">
-                                Registration:
-                                <span class="font-medium text-base text-desa-dark-green">
-                                    Open
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                    <a href="kd-event-desa-manage.html"
-                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
-                        <span class="font-medium text-white">Manage</span>
-                    </a>
-                </div>
-                <hr class="border-desa-background">
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-red/10 overflow-hidden">
-                            <img src="@/assets/images/icons/wallet-3-red.svg" class="flex size-6 shrink-0" alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-red">Rp499.000</p>
-                            <p class="font-medium text-sm text-desa-secondary">Harga Event</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-blue/10 overflow-hidden">
-                            <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-blue">15.600 Warga</p>
-                            <p class="font-medium text-sm text-desa-secondary">Total Partisipasi</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                            <img src="@/assets/images/icons/calendar-2-dark-green.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-dark-green">Mon, 24 Feb 2025</p>
-                            <p class="font-medium text-sm text-desa-secondary">Tanggal Pelaksanaan</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card flex flex-col gap-6 rounded-3xl p-6 bg-white">
-                <div class="flex items-center w-full">
-                    <div class="flex w-[100px] h-20 shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
-                        <img src="@/assets/images/thumbnails/kk-event-desa-5.png" class="w-full h-full object-cover"
-                            alt="photo">
-                    </div>
-                    <div class="flex flex-col gap-[6px] w-full ml-4 mr-9">
-                        <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">Mengenal Dunia Digital:
-                            Pengenalan HTML untuk Pemula</p>
-                        <div class="flex items-center gap-1">
-                            <img src="@/assets/images/icons/ticket-secondary-green.svg"
-                                class="flex size-[18px] shrink-0" alt="icon">
-                            <p class="font-medium text-sm text-desa-secondary">
-                                Registration:
-                                <span class="font-medium text-base text-desa-dark-green">
-                                    Open
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                    <a href="kd-event-desa-manage.html"
-                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
-                        <span class="font-medium text-white">Manage</span>
-                    </a>
-                </div>
-                <hr class="border-desa-background">
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-red/10 overflow-hidden">
-                            <img src="@/assets/images/icons/wallet-3-red.svg" class="flex size-6 shrink-0" alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-red">Rp499.000</p>
-                            <p class="font-medium text-sm text-desa-secondary">Harga Event</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-blue/10 overflow-hidden">
-                            <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-blue">15.600 Warga</p>
-                            <p class="font-medium text-sm text-desa-secondary">Total Partisipasi</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                            <img src="@/assets/images/icons/calendar-2-dark-green.svg" class="flex size-6 shrink-0"
-                                alt="icon">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-semibold text-lg leading-5 text-desa-dark-green">Mon, 24 Feb 2025</p>
-                            <p class="font-medium text-sm text-desa-secondary">Tanggal Pelaksanaan</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+            <PaginationUI v-if="!isInitialLoading && hasEvents" :meta="meta" :server-options="serverOptions"
+                @update:server-options="handleUpdateServerOptions" />
         </section>
-        <nav id="Pagination">
-            <ul class="flex items-center gap-3">
-                <li class="group">
-                    <button type="button" disabled
-                        class="group/arrow flex size-11 shrink-0 items-center justify-center rounded-full bg-desa-foreshadow disabled:!bg-desa-foreshadow group-hover:bg-desa-dark-green transition-setup">
-                        <img src="@/assets/images/icons/arrow-left-dark-green.svg"
-                            class="flex size-6 shrink-0 group-hover:hidden group-disabled/arrow:!hidden" alt="icon">
-                        <img src="@/assets/images/icons/arrow-left-foreshadow.svg"
-                            class="hidden size-6 shrink-0 group-hover:flex group-disabled/arrow:!hidden" alt="icon">
-                        <img src="@/assets/images/icons/disabled-arrow-pagination.svg"
-                            class="hidden size-6 shrink-0 group-disabled/arrow:!flex" alt="icon">
-                    </button>
-                </li>
-                <li class="group active">
-                    <a
-                        class="flex size-11 shrink-0 items-center justify-center rounded-full bg-desa-foreshadow group-hover:bg-desa-dark-green group-[.active]:bg-desa-dark-green transition-setup">
-                        <span
-                            class="text-desa-dark-green font-semibold group-[.active]:text-desa-foreshadow group-hover:text-desa-foreshadow transition-setup">
-                            1
-                        </span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a
-                        class="flex size-11 shrink-0 items-center justify-center rounded-full bg-desa-foreshadow group-hover:bg-desa-dark-green group-[.active]:bg-desa-dark-green transition-setup">
-                        <span
-                            class="text-desa-dark-green font-semibold group-[.active]:text-desa-foreshadow group-hover:text-desa-foreshadow transition-setup">
-                            2
-                        </span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a
-                        class="flex size-11 shrink-0 items-center justify-center rounded-full bg-desa-foreshadow group-hover:bg-desa-dark-green group-[.active]:bg-desa-dark-green transition-setup">
-                        <span
-                            class="text-desa-dark-green font-semibold group-[.active]:text-desa-foreshadow group-hover:text-desa-foreshadow transition-setup">
-                            3
-                        </span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a
-                        class="flex size-11 shrink-0 items-center justify-center rounded-full bg-desa-foreshadow group-hover:bg-desa-dark-green group-[.active]:bg-desa-dark-green transition-setup">
-                        <span
-                            class="text-desa-dark-green font-semibold group-[.active]:text-desa-foreshadow group-hover:text-desa-foreshadow transition-setup">
-                            4
-                        </span>
-                    </a>
-                </li>
-                <li class="group">
-                    <a
-                        class="flex size-11 shrink-0 items-center justify-center rounded-full bg-desa-foreshadow group-hover:bg-desa-dark-green group-[.active]:bg-desa-dark-green transition-setup">
-                        <span
-                            class="text-desa-dark-green font-semibold group-[.active]:text-desa-foreshadow group-hover:text-desa-foreshadow transition-setup">
-                            5
-                        </span>
-                    </a>
-                </li>
-                <li class="group">
-                    <button type="button"
-                        class="group/arrow flex size-11 shrink-0 items-center justify-center rounded-full bg-desa-foreshadow disabled:!bg-desa-foreshadow group-hover:bg-desa-dark-green transition-setup">
-                        <img src="@/assets/images/icons/arrow-left-dark-green.svg"
-                            class="flex size-6 shrink-0 rotate-180 group-hover:hidden group-disabled/arrow:!hidden"
-                            alt="icon">
-                        <img src="@/assets/images/icons/arrow-left-foreshadow.svg"
-                            class="hidden size-6 shrink-0 rotate-180 group-hover:flex group-disabled/arrow:!hidden"
-                            alt="icon">
-                        <img src="@/assets/images/icons/disabled-arrow-pagination.svg"
-                            class="hidden size-6 shrink-0 rotate-180 group-disabled/arrow:!flex" alt="icon">
-                    </button>
-                </li>
-            </ul>
-        </nav>
     </div>
 </template>
+
+<style scoped>
+.loading-dot {
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loading-dot {
+        animation: none;
+    }
+}
+</style>

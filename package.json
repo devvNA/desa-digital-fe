@@ -13,6 +13,7 @@
     "format": "oxfmt src/"
   },
   "dependencies": {
+    "@vuepic/vue-datepicker": "^12.1.0",
     "axios": "^1.14.0",
     "chart.js": "^4.5.1",
     "js-cookie": "^3.0.5",

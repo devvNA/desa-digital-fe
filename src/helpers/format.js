@@ -1,6 +1,16 @@
 import { DateTime } from "luxon";
 import numeral from "numeral";
 
+function parseDateValue(value) {
+    if (!value) return null;
+
+    const raw = String(value);
+    const dateStr = raw.includes("T") ? raw : `${raw}T00:00:00`;
+    const date = new Date(dateStr);
+
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
 export function formatRupiah(value) {
     if (value === null || value === undefined || value === "") {
         return "Rp0";
@@ -42,13 +52,22 @@ export function formatPercentage(value) {
 }
 
 export function formatDate(value) {
-    if (!value) return "-";
-    const raw = String(value);
-    // Append T00:00:00 to date-only strings to avoid timezone day-shift
-    const dateStr = raw.includes("T") ? raw : `${raw}T00:00:00`;
-    const date = new Date(dateStr);
-    if (Number.isNaN(date.getTime())) return "-";
+    const date = parseDateValue(value);
+    if (!date) return "-";
+
     return date.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+}
+
+export function formatDateWithDay(value) {
+    const date = parseDateValue(value);
+    if (!date) return "-";
+
+    return date.toLocaleDateString("id-ID", {
+        weekday: "long",
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -64,6 +83,20 @@ export function formatDateTime(date) {
         minute: "numeric",
     };
     return new Date(date).toLocaleString("id-ID", options);
+}
+
+export function formatTimeWIB(value) {
+    const date = parseDateValue(value);
+    if (!date) return "-";
+
+    const time = date.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Asia/Jakarta",
+    });
+
+    return `${time} WIB`;
 }
 
 export function formatToClientTimezone(value) {

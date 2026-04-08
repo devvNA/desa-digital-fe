@@ -1,82 +1,140 @@
 <script setup>
 import IconCalendarBlack from '@/assets/images/icons/calendar-2-black.svg';
 import IconCalendarSecondaryGreen from '@/assets/images/icons/calendar-2-secondary-green.svg';
+import IconDollarBlack from '@/assets/images/icons/dollar-square-black.svg';
+import IconDollarSecondaryGreen from '@/assets/images/icons/dollar-square-secondary-green.svg';
 import IconEditBlack from '@/assets/images/icons/edit-black.svg';
 import IconEditSecondaryGreen from '@/assets/images/icons/edit-secondary-green.svg';
-import IconProfileCircleBlack from '@/assets/images/icons/profile-circle-black.svg';
-import IconProfileCircleSecondaryGreen from '@/assets/images/icons/profile-circle-secondary-green.svg';
-import IconWalletBlack from '@/assets/images/icons/wallet-3-black.svg';
-import IconWalletSecondaryGreen from '@/assets/images/icons/wallet-3-secondary-green.svg';
 import Input from '@/components/ui/Input.vue';
-import { calculateEndDate, mapDevelopmentResponse, normalizeAmountInput, normalizeDateInput } from '@/helpers/development';
+import TimePicker from '@/components/ui/TimePicker.vue'; // Sesuaikan path jika file diletakkan di tempat berbeda
+import { normalizeAmountInput, normalizeDateInput } from '@/helpers/development';
 import { formatRupiah } from '@/helpers/format';
-import { fallbackThumbnail, handleImageError } from '@/helpers/socialAssistance';
+import { fallbackThumbnail, handleImageError, normalizeImageUrl } from '@/helpers/socialAssistance';
 import router from '@/router';
-import { useDevelopmentStore } from '@/stores/development';
+import { useEventStore } from '@/stores/event';
+import '@vuepic/vue-datepicker/dist/main.css';
 import { storeToRefs } from 'pinia';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 
-// ── Route / refs ──────────────────────────────────────────────────
+// Asumsi Anda memiliki icon jam, silakan sesuaikan path/nama filenya.
+// Jika tidak ada, Anda bisa memakai IconCalendar untuk sementara.
+import { default as IconClockBlack } from '@/assets/images/icons/clock-black.svg';
+import { default as IconClockSecondaryGreen } from '@/assets/images/icons/clock-secondary-green.svg';
+
+// -- Reactive state tambahan untuk Modal Timepicker --
+const isTimeModalOpen = ref(false);
+
+// -- Route / refs -------------------------------------------------
 const route = useRoute();
 const fileInput = ref(null);
 const previewObjectUrl = ref(null);
+const timePickerValue = ref(null);
 
-// ── Constants ─────────────────────────────────────────────────────
+// -- Constants ----------------------------------------------------
 const MAX_AMOUNT_INTEGER_DIGITS = 15;
 const MAX_AMOUNT_DECIMAL_DIGITS = 2;
 
-// ── Store ────────────────────────────────────────────────────────
-const developmentStore = useDevelopmentStore();
-const { loading, error, } = storeToRefs(developmentStore);
+// -- Store --------------------------------------------------------
+const eventStore = useEventStore();
+const { loading, error } = storeToRefs(eventStore);
 
-// ── Reactive state ───────────────────────────────────────────────
+// -- Reactive state -----------------------------------------------
 const validationErrors = ref({});
 
-function createInitialDevelopmentState() {
+function createInitialEventState() {
     return {
         id: route.params.id,
         thumbnail: null,
         thumbnail_url: fallbackThumbnail,
         name: '',
         description: '',
-        person_in_charge: '',
-        start_date: '',
-        day: '',
-        end_date: '',
-        amount: '',
-        status: 'ongoing',
+        price: '',
+        date: '',
+        time: '',
+        is_active: true,
     };
 }
 
-const development = ref(createInitialDevelopmentState());
 
-// ── Derived state ────────────────────────────────────────────────
+
+const event = ref(createInitialEventState());
+
+// -- Derived state ------------------------------------------------
 const generalError = computed(() => {
     if (typeof error.value === 'string') return error.value;
     if (error.value && typeof error.value === 'object') {
-        return 'Data pembangunan gagal diperbarui. Periksa kembali input yang bertanda error.';
+        return 'Data event gagal diperbarui. Periksa kembali input yang bertanda error.';
     }
 
     return null;
 });
 
 const amountInput = computed({
-    get: () => formatAmountInput(development.value.amount),
+    get: () => formatAmountInput(event.value.price),
     set: (value) => {
-        development.value.amount = normalizeAmountInput(value);
+        event.value.price = normalizeAmountInput(value);
     },
 });
 
-// ── Data fetching ────────────────────────────────────────────────
-async function fetchData() {
-    const response = await developmentStore.fetchDevelopment(route.params.id);
-    if (!response) return;
+// -- Data mapping / fetching --------------------------------------
+function normalizeTimeInput(value) {
+    if (!value) return '';
 
-    development.value = mapDevelopmentResponse(response, route.params.id);
+    const match = String(value).match(/^(\d{2}:\d{2})/);
+    return match ? match[1] : '';
 }
 
-// ── UI helpers ───────────────────────────────────────────────────
+function createTimePickerValue(value) {
+    const normalized = normalizeTimeInput(value);
+    if (!normalized) return null;
+
+    const [hours, minutes] = normalized.split(':').map(Number);
+
+    if (!Number.isInteger(hours) || !Number.isInteger(minutes)) {
+        return null;
+    }
+
+    return { hours, minutes };
+}
+
+function formatTimePickerValue(value) {
+    if (!value || typeof value !== 'object') return '';
+
+    const hours = Number(value.hours);
+    const minutes = Number(value.minutes);
+
+    if (!Number.isInteger(hours) || !Number.isInteger(minutes)) {
+        return '';
+    }
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+function mapEventResponse(response, routeId) {
+    return {
+        id: response.id ?? routeId,
+        thumbnail: null,
+        thumbnail_url: normalizeImageUrl(response.thumbnail, fallbackThumbnail),
+        name: response.name ?? '',
+        description: response.description ?? '',
+        price: response.price == null ? '' : normalizeAmountInput(response.price),
+        date: normalizeDateInput(response.date),
+        time: normalizeTimeInput(response.time),
+        is_active: response.is_active == null ? true : Boolean(response.is_active),
+    };
+}
+
+async function fetchData() {
+    const response = await eventStore.fetchEvent(route.params.id);
+    if (!response) return;
+
+    const mappedEvent = mapEventResponse(response, route.params.id);
+    event.value = mappedEvent;
+    timePickerValue.value = createTimePickerValue(mappedEvent.time);
+}
+
+// -- UI helpers ---------------------------------------------------
 function clearErrors() {
     validationErrors.value = {};
     error.value = null;
@@ -92,12 +150,12 @@ function getFieldError(field) {
     return Array.isArray(err) ? err[0] : err;
 }
 
-function onImageError(event) {
-    handleImageError(event, fallbackThumbnail);
+function onImageError(currentEvent) {
+    handleImageError(currentEvent, fallbackThumbnail);
 }
 
-function handleImageChange(event) {
-    const file = event.target.files?.[0];
+function handleImageChange(currentEvent) {
+    const file = currentEvent.target.files?.[0];
     if (!file) return;
 
     if (previewObjectUrl.value) {
@@ -105,8 +163,12 @@ function handleImageChange(event) {
     }
 
     previewObjectUrl.value = URL.createObjectURL(file);
-    development.value.thumbnail = file;
-    development.value.thumbnail_url = previewObjectUrl.value;
+    event.value.thumbnail = file;
+    event.value.thumbnail_url = previewObjectUrl.value;
+}
+
+function handleTimePickerChange(value) {
+    event.value.time = formatTimePickerValue(value);
 }
 
 function formatAmountInput(value) {
@@ -122,42 +184,36 @@ function validateAmountInput(value) {
     const decDigits = decimalPart.replace(/\D/g, '');
 
     if (intDigits.length > MAX_AMOUNT_INTEGER_DIGITS) {
-        return `Nominal dana terlalu besar. Maksimal ${MAX_AMOUNT_INTEGER_DIGITS} digit sebelum koma.`;
+        return `Nominal harga terlalu besar. Maksimal ${MAX_AMOUNT_INTEGER_DIGITS} digit sebelum koma.`;
     }
 
     if (decDigits.length > MAX_AMOUNT_DECIMAL_DIGITS) {
-        return `Nominal dana hanya boleh memiliki ${MAX_AMOUNT_DECIMAL_DIGITS} angka desimal.`;
+        return `Nominal harga hanya boleh memiliki ${MAX_AMOUNT_DECIMAL_DIGITS} angka desimal.`;
     }
 
     return null;
 }
 
-// ── Derived form sync ────────────────────────────────────────────
-function syncEndDate() {
-    development.value.end_date = calculateEndDate(development.value.start_date, development.value.day);
-}
-
-// ── Actions ──────────────────────────────────────────────────────
+// -- Actions ------------------------------------------------------
 async function handleSubmit() {
     validationErrors.value = {};
     error.value = null;
 
-    const amountError = validateAmountInput(development.value.amount);
+    const amountError = validateAmountInput(event.value.price);
     if (amountError) {
-        validationErrors.value = { amount: [amountError] };
+        validationErrors.value = { price: [amountError] };
         return;
     }
 
-    const normalizedAmount = normalizeAmountInput(development.value.amount);
-    const result = await developmentStore.updateDevelopment(route.params.id, {
-        thumbnail: development.value.thumbnail,
-        name: development.value.name,
-        description: development.value.description,
-        person_in_charge: development.value.person_in_charge,
-        start_date: normalizeDateInput(development.value.start_date),
-        end_date: normalizeDateInput(development.value.end_date),
-        amount: normalizedAmount === '' ? '' : Number(normalizedAmount),
-        status: development.value.status,
+    const normalizedAmount = normalizeAmountInput(event.value.price);
+    const result = await eventStore.updateEvent(route.params.id, {
+        thumbnail: event.value.thumbnail,
+        name: event.value.name,
+        description: event.value.description,
+        price: normalizedAmount === '' ? '' : Number(normalizedAmount),
+        date: normalizeDateInput(event.value.date),
+        time: normalizeTimeInput(event.value.time),
+        is_active: event.value.is_active ? '1' : '0',
     });
 
     if (!result) {
@@ -165,10 +221,10 @@ async function handleSubmit() {
         return;
     }
 
-    await router.replace({ name: 'manage-development', params: { id: route.params.id } });
+    await router.replace({ name: 'manage-event', params: { id: route.params.id } });
 }
 
-watch([() => development.value.start_date, () => development.value.day], syncEndDate);
+watch(timePickerValue, handleTimePickerChange);
 
 onMounted(fetchData);
 
@@ -184,15 +240,14 @@ onBeforeUnmount(() => {
         <div id="Header" class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
                 <div class="flex gap-1 items-center leading-5 text-desa-secondary">
-                    <router-link :to="{ name: 'development' }"
-                        class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize hover:underline">Pembangunan
-                        Desa
-                    </router-link>
+                    <router-link :to="{ name: 'event' }"
+                        class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize hover:underline">Event
+                        Desa</router-link>
                     <span>/</span>
-                    <p class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize ">Edit
-                        Pembangunan Desa</p>
+                    <p class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize ">Edit Event
+                        Desa</p>
                 </div>
-                <h1 class="font-semibold text-2xl">Edit Pembangunan Desa</h1>
+                <h1 class="font-semibold text-2xl">Edit Event Desa</h1>
             </div>
         </div>
 
@@ -206,24 +261,14 @@ onBeforeUnmount(() => {
 
         <form @submit.prevent="handleSubmit" id="myForm" class="capitalize">
             <div class="shrink-0 rounded-3xl p-6 bg-white flex flex-col gap-6 h-fit">
-                <section id="Total-Dana" class="flex items-center justify-between">
-                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Total Dana Pembangunan
-                    </p>
-                    <div class="flex flex-col gap-3 flex-1 shrink-0">
-                        <Input v-model="amountInput" type="text" placeholder="Ketik dana yang dibutuhkan"
-                            :error-message="getFieldError('amount')" :icon="IconWalletSecondaryGreen"
-                            :filled-icon="IconWalletBlack" />
-                    </div>
-                </section>
-                <hr class="border-desa-background" />
                 <section id="Thumbnail" class="flex items-center justify-between">
-                    <h2 class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Thumbnail Pembangunan
-                        Desa
+                    <h2 class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Thumbnail Event
+                        Terkait
                     </h2>
                     <div class="flex-1 flex items-center justify-between">
                         <div
                             class="flex justify-center w-[120px] h-[100px] rounded-2xl overflow-hidden bg-desa-foreshadow">
-                            <img :src="development.thumbnail_url || fallbackThumbnail" alt="image"
+                            <img :src="event.thumbnail_url || fallbackThumbnail" alt="image"
                                 class="size-full object-cover" @error="onImageError" />
                         </div>
                         <div class="relative">
@@ -244,37 +289,27 @@ onBeforeUnmount(() => {
                     }}</span>
                 </div>
                 <hr class="border-desa-background" />
-                <section id="Nama-Projek" class="flex items-center justify-between">
-                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Nama Projek Pembangunan
-                    </p>
+
+                <section id="Nama-Event" class="flex items-center justify-between">
+                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Nama Event</p>
                     <div class="flex flex-col gap-3 flex-1 shrink-0">
-                        <Input v-model="development.name" type="text" placeholder="Tentukan nama bantuan sosial"
+                        <Input v-model="event.name" type="text" placeholder="Ketik nama event terkait"
                             :error-message="getFieldError('name')" :icon="IconEditSecondaryGreen"
                             :filled-icon="IconEditBlack" />
                     </div>
                 </section>
                 <hr class="border-desa-background" />
-                <section id="Penanggung-Jawab" class="flex items-center justify-between">
-                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Penanggung Jawab</p>
-                    <div class="flex flex-col gap-3 flex-1 shrink-0">
-                        <Input v-model="development.person_in_charge" type="text"
-                            placeholder="Tentukan nama bantuan sosial"
-                            :error-message="getFieldError('person_in_charge')" :icon="IconProfileCircleSecondaryGreen"
-                            :filled-icon="IconProfileCircleBlack" />
-                    </div>
-                </section>
-                <hr class="border-desa-background" />
+
                 <section id="Status" class="flex items-center justify-between">
-                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Status Pembangunan</p>
+                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Pilih status event</p>
                     <div class="flex flex-1 gap-6 shrink-0">
                         <label
                             class="group flex w-full items-center h-14 rounded-2xl p-4 ring-[1.5px] ring-desa-background gap-2 has-[:checked]:ring-none has-[:checked]:bg-desa-foreshadow transition-setup">
-                            <input v-model="development.status" :value="'ongoing'" type="radio" checked name="status"
-                                id=""
+                            <input v-model="event.is_active" :value="true" type="radio" name="status"
                                 class="flex size-[18px] shrink-0 accent-desa-secondary checked:accent-desa-dark-green transition-setup">
                                 <span
                                     class="font-medium leading-5 text-desa-secondary w-full group-has-[:checked]:text-desa-dark-green transition-setup">
-                                    On Going
+                                    Open
                                 </span>
                                 <div class="flex size-6 shrink-0">
                                     <img src="@/assets/images/icons/tick-circle-secondary-green.svg"
@@ -285,11 +320,11 @@ onBeforeUnmount(() => {
                         </label>
                         <label
                             class="group flex w-full items-center h-14 rounded-2xl p-4 ring-[1.5px] ring-desa-background gap-2 has-[:checked]:ring-none has-[:checked]:bg-desa-foreshadow transition-setup">
-                            <input v-model="development.status" :value="'completed'" type="radio" name="status" id=""
+                            <input v-model="event.is_active" :value="false" type="radio" name="status"
                                 class="flex size-[18px] shrink-0 accent-desa-secondary checked:accent-desa-dark-green transition-setup">
                                 <span
                                     class="font-medium leading-5 text-desa-secondary w-full group-has-[:checked]:text-desa-dark-green transition-setup">
-                                    Completed
+                                    Closed
                                 </span>
                                 <div class="flex size-6 shrink-0">
                                     <img src="@/assets/images/icons/close-circle-secondary-green.svg"
@@ -300,52 +335,70 @@ onBeforeUnmount(() => {
                         </label>
                     </div>
                 </section>
-                <div v-if="getFieldError('status')" class="flex justify-end">
-                    <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{ getFieldError('status')
+                <div v-if="getFieldError('is_active')" class="flex justify-end">
+                    <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{ getFieldError('is_active')
                     }}</span>
                 </div>
                 <hr class="border-desa-background" />
-                <section id="Tanggal-Pembangunan" class="flex items-center justify-between">
-                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Tanggal Pembangunan</p>
+
+                <section id="Harga-Event" class="flex items-center justify-between">
+                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Harga Event</p>
+                    <div class="flex flex-col gap-3 flex-1 shrink-0">
+                        <Input v-model="amountInput" type="text" placeholder="Ketik total harga event"
+                            :error-message="getFieldError('price')" :icon="IconDollarSecondaryGreen"
+                            :filled-icon="IconDollarBlack" />
+                    </div>
+                </section>
+                <hr class="border-desa-background" />
+
+                <section id="Tanggal" class="flex items-center justify-between">
+                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Tanggal event dilakukan
+                    </p>
                     <div class="flex items-center gap-6 flex-1 shrink-0">
                         <label class="relative group peer w-full">
-                            <Input v-model="development.start_date" type="date" placeholder="Pilih Tanggal Awal"
-                                :error-message="getFieldError('start_date')" :icon="IconCalendarSecondaryGreen"
+                            <Input v-model="event.date" type="date" placeholder="Pilih tanggal event"
+                                :error-message="getFieldError('date')" :icon="IconCalendarSecondaryGreen"
                                 :filled-icon="IconCalendarBlack" />
                         </label>
                     </div>
                 </section>
                 <hr class="border-desa-background" />
-                <section id="Hari" class="flex items-center justify-between">
-                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Hari yang dibutuhkan</p>
-                    <div class="flex flex-col gap-3 flex-1 shrink-0">
-                        <label class="relative group peer w-full">
-                            <input v-model="development.day" type="number" placeholder="Ketik hari yang dibutuhkan"
-                                class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 px-12 pr-[98px] gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300">
-                                <div class="absolute transform -translate-y-1/2 top-1/2 left-4 flex size-6 shrink-0">
-                                    <img src="@/assets/images/icons/timer-secondary-green.svg"
-                                        class="size-6 hidden group-has-[:placeholder-shown]:flex" alt="icon">
-                                    <img src="@/assets/images/icons/timer-black.svg"
-                                        class="size-6 flex group-has-[:placeholder-shown]:hidden" alt="icon">
-                                </div>
-                                <div class="absolute transform -translate-y-1/2 top-1/2 right-4 flex shrink-0 gap-6">
-                                    <div class="w-px h-6 border border-desa-background"></div>
-                                    <span
-                                        class="font-medium leading-5 text-desa-dark-green group-has-[:placeholder-shown]:text-desa-secondary">Hari</span>
-                                </div>
-                        </label>
-                    </div>
-                </section>
-                <div v-if="getFieldError('day')" class="flex justify-end">
-                    <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{ getFieldError('day') }}</span>
-                </div>
-                <hr class="border-desa-background" />
-                <section id="Deskripsi" class="flex items-center justify-between">
-                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Deskripsi Pembangunan
+
+                <section id="Waktu" class="flex items-center justify-between">
+                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Waktu event dilakukan
                     </p>
                     <div class="flex flex-col gap-3 flex-1 shrink-0">
-                        <textarea v-model="development.description" name="" id=""
-                            placeholder="Jelaskan lebih detail tentang pembangunan" rows="6"
+                        <div class="relative w-full">
+                            <div class="cursor-pointer" @click="isTimeModalOpen = true">
+                                <Input v-model="event.time" type="text" placeholder="Pilih waktu event"
+                                    :error-message="getFieldError('time')" :icon="IconClockSecondaryGreen"
+                                    :filled-icon="IconClockBlack" readonly class="pointer-events-none" />
+                            </div>
+
+                            <Teleport to="body">
+                                <div v-if="isTimeModalOpen" class="fixed inset-0 flex items-center justify-center"
+                                    style="z-index: 1000">
+                                    <div class="absolute inset-0" style="background: rgba(0,0,0,0.3)"
+                                        @click="isTimeModalOpen = false"></div>
+                                    <div class="relative">
+                                        <TimePicker v-model="event.time" @close="isTimeModalOpen = false" />
+                                    </div>
+                                </div>
+                            </Teleport>
+                        </div>
+                    </div>
+                </section>
+                <div v-if="getFieldError('time')" class="flex justify-end">
+                    <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{ getFieldError('time')
+                        }}</span>
+                </div>
+                <hr class="border-desa-background" />
+
+                <section id="Deskripsi" class="flex items-center justify-between">
+                    <p class="font-medium leading-5 text-desa-secondary w-[calc(424/904*100%)]">Deskripsi event terkait
+                    </p>
+                    <div class="flex flex-col gap-3 flex-1 shrink-0">
+                        <textarea v-model="event.description" placeholder="Jelaskan lebih detail tentang event" rows="6"
                             class="appearance-none outline-none w-full rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 px-4 gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300"></textarea>
                     </div>
                 </section>
@@ -354,8 +407,9 @@ onBeforeUnmount(() => {
                     }}</span>
                 </div>
                 <hr class="border-desa-background w-[calc(100%+48px)] -mx-6" />
+
                 <section id="Buttons" class="flex items-center justify-end gap-4">
-                    <RouterLink :to="{ name: 'manage-development', params: { id: development.id } }">
+                    <RouterLink :to="{ name: 'manage-event', params: { id: event.id } }">
                         <div
                             class="py-[18px] rounded-2xl bg-desa-red w-[180px] text-center flex justify-center font-medium text-white">
                             Batal, Tidak jadi</div>
@@ -368,5 +422,4 @@ onBeforeUnmount(() => {
             </div>
         </form>
     </div>
-
 </template>

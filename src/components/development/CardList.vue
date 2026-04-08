@@ -51,8 +51,8 @@ const hasDevelopments = computed(() => props.developments.length > 0)
         <div v-for="item in developments" :key="item.id" class="card flex flex-col gap-6 rounded-3xl bg-white p-6">
             <div class="flex items-center w-full gap-4">
                 <div class="flex h-20 w-[100px] shrink-0 overflow-hidden rounded-2xl bg-desa-foreshadow">
-                    <img :src="getThumbnail(item.thumbnail)" class="h-full w-full object-cover" alt="development thumbnail"
-                        @error="handleImageError($event, fallbackThumbnail)">
+                    <img :src="getThumbnail(item.thumbnail)" class="h-full w-full object-cover"
+                        alt="development thumbnail" @error="handleImageError($event, fallbackThumbnail)">
                 </div>
                 <div class="mr-9 flex w-full flex-col gap-[6px]">
                     <p class="line-clamp-1 text-lg font-semibold leading-[22.5px]">{{ item.name }}</p>
@@ -80,7 +80,8 @@ const hasDevelopments = computed(() => props.developments.length > 0)
 
             <div class="grid grid-cols-3 gap-3">
                 <div class="flex items-center gap-3">
-                    <div class="flex size-[52px] items-center justify-center overflow-hidden rounded-2xl bg-desa-red/10">
+                    <div
+                        class="flex size-[52px] items-center justify-center overflow-hidden rounded-2xl bg-desa-red/10">
                         <img src="@/assets/images/icons/wallet-3-red.svg" class="flex size-6 shrink-0"
                             alt="budget icon">
                     </div>
@@ -90,7 +91,8 @@ const hasDevelopments = computed(() => props.developments.length > 0)
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="flex size-[52px] items-center justify-center overflow-hidden rounded-2xl bg-desa-blue/10">
+                    <div
+                        class="flex size-[52px] items-center justify-center overflow-hidden rounded-2xl bg-desa-blue/10">
                         <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
                             alt="applicant icon">
                     </div>
@@ -113,7 +115,6 @@ const hasDevelopments = computed(() => props.developments.length > 0)
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div v-if="!hasDevelopments" class="rounded-3xl bg-white p-8 text-center text-desa-secondary">
