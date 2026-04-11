@@ -88,6 +88,15 @@ const numberFormatter = new Intl.NumberFormat('id-ID')
 const dashboardPayload = computed(() => dashboardData.value ?? {})
 const hasDashboardData = computed(() => Object.keys(dashboardPayload.value).length > 0)
 const isInitialLoading = computed(() => loading.value && !hasDashboardData.value)
+const isFamilyMembersInitialLoading = computed(
+    () => loadingFamilyMember.value && familyMembers.value.length === 0,
+)
+const isSocialAssistanceRecipientsInitialLoading = computed(
+    () => loadingSocialAssistanceRecipient.value && socialAssistanceRecipients.value.length === 0,
+)
+const isEventParticipantsInitialLoading = computed(
+    () => loadingEventParticipant.value && eventParticipants.value.length === 0,
+)
 const errorMessage = computed(
     () => error.value?.response?.data?.message ?? error.value?.message ?? '',
 )
@@ -251,9 +260,11 @@ onMounted(async () => {
         await dashboardStore.getDashboardData()
         await renderResidentChart()
     } else {
-        await fetchFamilyMembers()
-        await fetchSocialAssistanceRecipients()
-        await fetchEventParticipants()
+        await Promise.all([
+            fetchFamilyMembers(),
+            fetchSocialAssistanceRecipients(),
+            fetchEventParticipants(),
+        ])
     }
 })
 
@@ -895,6 +906,11 @@ onBeforeUnmount(() => {
                 <header>
                     <h1 class="font-semibold text-2xl leading-[30px]">Rumah Tangga Stats</h1>
                 </header>
+                <div v-if="loadingFamilyMember || loadingSocialAssistanceRecipient || loadingEventParticipant"
+                    class="inline-flex items-center gap-2 rounded-full border border-desa-foreshadow bg-white px-4 py-2 text-sm text-desa-secondary w-fit">
+                    <span class="size-2 rounded-full bg-desa-soft-green loading-dot"></span>
+                    Memuat data rumah tangga
+                </div>
                 <div class="flex gap-[14px]">
                     <div class="flex flex-col gap-[14px] shrink-0 w-[calc(463/1000*100%)]">
                         <section id="Bantuan-Sosial" class="flex flex-col gap-6 p-6 gradient-vertical rounded-2xl">
@@ -932,6 +948,14 @@ onBeforeUnmount(() => {
                             <hr class="border-desa-background" />
                             <div id="Recent-Event" class="flex flex-col gap-4">
                                 <h3 class="font-medium leading-5 text-desa-secondary">Recent Events</h3>
+                                <div v-if="isEventParticipantsInitialLoading"
+                                    class="rounded-2xl border border-desa-background p-4 text-sm text-desa-secondary">
+                                    Memuat data event...
+                                </div>
+                                <div v-else-if="eventParticipants.length === 0"
+                                    class="rounded-2xl border border-desa-background p-4 text-sm text-desa-secondary">
+                                    Belum ada event yang diikuti.
+                                </div>
                                 <div class="event py-4 rounded-2xl border border-desa-background flex flex-col gap-4"
                                     v-for="data in eventParticipants" :key="data.id">
                                     <div class="time px-4 flex items-center justify-between">
@@ -1117,8 +1141,16 @@ onBeforeUnmount(() => {
                                 </div>
                             </div>
                             <div class="box h-[1px] w-full"></div>
-                            <div class="people flex flex-col gap-[14px]" v-for="familyMember in familyMembers"
-                                :key="familyMember.id">
+                            <div v-if="isFamilyMembersInitialLoading"
+                                class="rounded-2xl border border-desa-background p-4 text-sm text-desa-secondary">
+                                Memuat data anggota keluarga...
+                            </div>
+                            <div v-else-if="familyMembers.length === 0"
+                                class="rounded-2xl border border-desa-background p-4 text-sm text-desa-secondary">
+                                Belum ada data anggota keluarga.
+                            </div>
+                            <div v-for="familyMember in familyMembers" :key="familyMember.id"
+                                class="people flex flex-col gap-[14px]">
                                 <div class="rounded-2xl border border-desa-background p-4 flex flex-col gap-6">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-[12px]">
@@ -1176,6 +1208,14 @@ onBeforeUnmount(() => {
                             <div class="box h-[1px] w-full"></div>
                             <div class="people flex flex-col gap-4">
                                 <h3 class="font-medium leading-5 text-desa-secondary">Recent Bansos</h3>
+                                <div v-if="isSocialAssistanceRecipientsInitialLoading"
+                                    class="rounded-2xl border border-desa-background p-4 text-sm text-desa-secondary">
+                                    Memuat data bantuan sosial...
+                                </div>
+                                <div v-else-if="socialAssistanceRecipients.length === 0"
+                                    class="rounded-2xl border border-desa-background p-4 text-sm text-desa-secondary">
+                                    Belum ada pengajuan bantuan sosial.
+                                </div>
                                 <div v-for="data in socialAssistanceRecipients" :key="data.id"
                                     class="bantuan p-4 rounded-2xl border border-desa-background flex flex-col gap-4">
                                     <div class="flex items-center justify-between">

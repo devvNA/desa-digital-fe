@@ -8,6 +8,11 @@ const DashboardView = () => import("@/views/DashboardView.vue");
 const HeadOfFamiliesView = () => import("@/views/head-of-family/HeadOfFamiliesView.vue");
 const HeadOfFamilyDetailView = () => import("@/views/head-of-family/HeadOfFamilyDetailView.vue");
 const HeadOfFamilyCreateView = () => import("@/views/head-of-family/HeadOfFamilyCreateView.vue");
+const FamilyMembersView = () => import("@/views/family-member/FamilyMembersView.vue");
+const FamilyMemberDetailView = () => import("@/views/family-member/FamilyMemberDetailView.vue");
+const FamilyMemberCreateView = () => import("@/views/family-member/FamilyMemberCreateView.vue");
+const FamilyMemberByHeadOfFamilyDetailView = () =>
+    import("@/views/family-member/FamilyMemberByHeadOfFamilyDetailView.vue");
 const LoginView = () => import("@/views/LoginView.vue");
 const SocialAssistancesView = () => import("@/views/social-assistance/SocialAssistancesView.vue");
 const SocialAssistanceDetailView = () =>
@@ -62,6 +67,30 @@ const router = createRouter({
                     name: "create-head-of-family",
                     component: HeadOfFamilyCreateView,
                     meta: { requiresAuth: true, permission: "head-of-family-create" },
+                },
+                {
+                    path: "family-member",
+                    name: "family-member",
+                    component: FamilyMembersView,
+                    meta: { requiresAuth: true, permission: "family-member-list" },
+                },
+                {
+                    path: "family-member/:id",
+                    name: "manage-family-member",
+                    component: FamilyMemberDetailView,
+                    meta: { requiresAuth: true, permission: "family-member-list" },
+                },
+                {
+                    path: "family-member/create",
+                    name: "create-family-member",
+                    component: FamilyMemberCreateView,
+                    meta: { requiresAuth: true, permission: "family-member-create" },
+                },
+                {
+                    path: "family-member/head-of-family/:id",
+                    name: "manage-family-member-by-head-of-family",
+                    component: FamilyMemberByHeadOfFamilyDetailView,
+                    meta: { requiresAuth: true, permission: "family-member-list" },
                 },
                 {
                     path: "social-assistance",
