@@ -1,10 +1,10 @@
-import { handleError } from '@/helpers/errorHelper'
-import { axiosInstance } from '@/plugins/axios'
-import { defineStore } from 'pinia'
+import { handleError } from "@/helpers/errorHelper";
+import { axiosInstance } from "@/plugins/axios";
+import { defineStore } from "pinia";
 
 const normalizeSocialAssistanceRecipient = (item) => {
-    if (!item || typeof item !== 'object') {
-        return null
+    if (!item || typeof item !== "object") {
+        return null;
     }
 
     return {
@@ -18,10 +18,10 @@ const normalizeSocialAssistanceRecipient = (item) => {
         proof: item.proof ?? null,
         status: item.status ?? null,
         created_at: item.created_at ?? null,
-    }
-}
+    };
+};
 
-export const useSocialAssistanceRecipientStore = defineStore('socialAssistanceRecipient', {
+export const useSocialAssistanceRecipientStore = defineStore("socialAssistanceRecipient", {
     state: () => ({
         socialAssistanceRecipients: [],
         socialAssistanceRecipient: null,
@@ -36,116 +36,133 @@ export const useSocialAssistanceRecipientStore = defineStore('socialAssistanceRe
         success: null,
     }),
     actions: {
+        async fetchSocialAssistanceRecipients(params) {
+            this.loading = true;
+            this.error = null;
+            try {
+                const response = await axiosInstance.get("/social-assistance-recipient", {
+                    params,
+                });
+                this.socialAssistanceRecipients = (response.data.data ?? [])
+                    .map(normalizeSocialAssistanceRecipient)
+                    .filter(Boolean);
+            } catch (error) {
+                this.error = handleError(error);
+            } finally {
+                this.loading = false;
+            }
+        },
+
         async fetchSocialAssistanceRecipientsPaginated(params) {
-            this.loading = true
-            this.error = null
+            this.loading = true;
+            this.error = null;
             try {
                 const response = await axiosInstance.get(
-                    '/social-assistance-recipient/all/paginated',
+                    "/social-assistance-recipient/all/paginated",
                     {
                         params,
                     },
-                )
+                );
                 this.socialAssistanceRecipients = (response.data.data?.data ?? [])
                     .map(normalizeSocialAssistanceRecipient)
-                    .filter(Boolean)
-                this.meta = response.data.data?.meta ?? this.meta
+                    .filter(Boolean);
+                this.meta = response.data.data?.meta ?? this.meta;
             } catch (error) {
-                this.error = handleError(error)
+                this.error = handleError(error);
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
 
         async fetchSocialAssistanceRecipient(id) {
-            this.loading = true
-            this.error = null
-            this.success = null
+            this.loading = true;
+            this.error = null;
+            this.success = null;
             try {
-                const response = await axiosInstance.get(`/social-assistance-recipient/${id}`)
+                const response = await axiosInstance.get(`/social-assistance-recipient/${id}`);
                 this.socialAssistanceRecipient = normalizeSocialAssistanceRecipient(
                     response.data.data,
-                )
-                return this.socialAssistanceRecipient
+                );
+                return this.socialAssistanceRecipient;
             } catch (error) {
-                this.error = handleError(error)
-                this.socialAssistanceRecipient = null
-                return null
+                this.error = handleError(error);
+                this.socialAssistanceRecipient = null;
+                return null;
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
 
         async updateSocialAssistanceRecipient(id, payload) {
-            this.loading = true
-            this.error = null
-            this.success = null
+            this.loading = true;
+            this.error = null;
+            this.success = null;
 
             try {
-                const formData = new FormData()
+                const formData = new FormData();
 
-                formData.append('social_assistance_id', payload.social_assistance_id ?? '')
-                formData.append('head_of_family_id', payload.head_of_family_id ?? '')
-                formData.append('bank', payload.bank ?? '')
-                formData.append('amount', payload.amount ?? '')
-                formData.append('reason', payload.reason ?? '')
-                formData.append('account_number', payload.account_number ?? '')
-                formData.append('status', payload.status ?? '')
+                formData.append("social_assistance_id", payload.social_assistance_id ?? "");
+                formData.append("head_of_family_id", payload.head_of_family_id ?? "");
+                formData.append("bank", payload.bank ?? "");
+                formData.append("amount", payload.amount ?? "");
+                formData.append("reason", payload.reason ?? "");
+                formData.append("account_number", payload.account_number ?? "");
+                formData.append("status", payload.status ?? "");
 
                 if (payload.proof instanceof File) {
-                    formData.append('proof', payload.proof)
+                    formData.append("proof", payload.proof);
                 }
 
                 if (import.meta.env.DEV) {
-                    console.debug('[socialAssistanceRecipientStore] update payload', {
+                    console.debug("[socialAssistanceRecipientStore] update payload", {
                         id,
                         socialAssistanceId: payload.social_assistance_id,
                         headOfFamilyId: payload.head_of_family_id,
                         status: payload.status,
                         hasProofFile: payload.proof instanceof File,
-                    })
+                    });
                 }
 
-                formData.append('_method', 'PUT')
+                formData.append("_method", "PUT");
 
                 const response = await axiosInstance.post(
                     `/social-assistance-recipient/${id}`,
                     formData,
                     {
                         headers: {
-                            'Content-Type': 'multipart/form-data',
+                            "Content-Type": "multipart/form-data",
                         },
                     },
-                )
+                );
 
                 this.socialAssistanceRecipient = normalizeSocialAssistanceRecipient(
                     response.data.data,
-                )
-                this.success = response.data.message
+                );
+                this.success = response.data.message;
 
-                return this.socialAssistanceRecipient
+                return this.socialAssistanceRecipient;
             } catch (error) {
-                this.error = handleError(error)
-                return null
+                this.error = handleError(error);
+                return null;
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
 
         async deleteSocialAssistanceRecipient(id) {
-            this.loading = true
-            this.error = null
-            this.success = null
+            this.loading = true;
+            this.error = null;
+            this.success = null;
             try {
-                const response = await axiosInstance.delete(`/social-assistance-recipient/${id}`)
-                this.success = response.data.message
-                return true
+                const response = await axiosInstance.delete(`/social-assistance-recipient/${id}`);
+                this.success = response.data.message;
+                return true;
             } catch (error) {
-                this.error = handleError(error)
-                return false
+                this.error = handleError(error);
+                return false;
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
     },
-})
+});
