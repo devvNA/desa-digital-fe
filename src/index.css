@@ -132,7 +132,7 @@
 
 ::before,
 ::after {
-    --tw-content: "";
+    --tw-content: '';
 }
 
 /*
@@ -157,8 +157,8 @@ html,
     tab-size: 4;
     /* 3 */
     font-family:
-        ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-        "Segoe UI Symbol", "Noto Color Emoji";
+        ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
     /* 4 */
     font-feature-settings: normal;
     /* 5 */
@@ -248,7 +248,7 @@ kbd,
 samp,
 pre {
     font-family:
-        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
         monospace;
     /* 1 */
     font-feature-settings: normal;
@@ -350,9 +350,9 @@ select {
   */
 
 button,
-input:where([type="button"]),
-input:where([type="reset"]),
-input:where([type="submit"]) {
+input:where([type='button']),
+input:where([type='reset']),
+input:where([type='submit']) {
     -webkit-appearance: button;
     /* 1 */
     background-color: transparent;
@@ -399,7 +399,7 @@ progress {
   2. Correct the outline style in Safari.
   */
 
-[type="search"] {
+[type='search'] {
     -webkit-appearance: textfield;
     /* 1 */
     outline-offset: -2px;
@@ -513,7 +513,7 @@ textarea::placeholder {
   */
 
 button,
-[role="button"] {
+[role='button'] {
     cursor: pointer;
 }
 
@@ -557,7 +557,7 @@ video {
 
 /* Make elements with the HTML hidden attribute stay hidden by default */
 
-[hidden]:where(:not([hidden="until-found"])) {
+[hidden]:where(:not([hidden='until-found'])) {
     display: none;
 }
 
@@ -2117,7 +2117,7 @@ body {
     flex-direction: column;
     background: #f2f9f6;
     color: #001b1a;
-    font-family: "Lexend Deca";
+    font-family: 'Lexend Deca';
 }
 
 .hide-scrollbar {
@@ -2153,8 +2153,8 @@ body {
     border-radius: 16px;
 }
 
-.bukti-menerima-bansos[src="#"],
-.bukti-menerima-bansos[src=""] {
+.bukti-menerima-bansos[src='#'],
+.bukti-menerima-bansos[src=''] {
     display: none;
 }
 

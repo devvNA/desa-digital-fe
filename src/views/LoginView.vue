@@ -15,7 +15,7 @@ const authStore = useAuthStore()
 const { loading, error } = storeToRefs(authStore)
 
 const form = ref({
-    role: '',
+    // role: '',
     email: '',
     password: '',
 })
@@ -28,10 +28,10 @@ const handleSubmit = async () => {
 
     let isValid = true
 
-    if (!form.value.role) {
-        validationErrors.value.role = ['Pilih role kamu terlebih dahulu']
-        isValid = false
-    }
+    // if (!form.value.role) {
+    //     validationErrors.value.role = ['Pilih role kamu terlebih dahulu']
+    //     isValid = false
+    // }
 
     if (!form.value.email) {
         validationErrors.value.email = ['Email Address harus diisi']
@@ -78,7 +78,11 @@ const handleSubmit = async () => {
             <div class="login-form-wrapper">
                 <!-- Logo -->
                 <header class="login-logo">
-                    <img src="@/assets/images/logos/logo-text.svg" alt="Desa Digital Logo" class="login-logo-img" />
+                    <img
+                        src="@/assets/images/logos/logo-text.svg"
+                        alt="Desa Digital Logo"
+                        class="login-logo-img"
+                    />
                 </header>
 
                 <!-- Heading -->
@@ -92,7 +96,7 @@ const handleSubmit = async () => {
                 <!-- Form -->
                 <form @submit.prevent="handleSubmit" novalidate class="login-form">
                     <!-- Role Selection -->
-                    <div class="login-field-group">
+                    <!-- <div class="login-field-group">
                         <label class="login-label">Role</label>
                         <section id="Select" class="login-role-grid">
                             <div class="login-role-option" :class="{
@@ -132,28 +136,46 @@ const handleSubmit = async () => {
                         <span class="login-error-text" v-if="validationErrors.role">
                             {{ validationErrors.role[0] }}
                         </span>
-                    </div>
+                    </div> -->
 
                     <!-- Email -->
                     <div class="login-field-group">
-                        <label class="login-label"
-                            :class="{ 'login-label--error': validationErrors.email || error?.email }">
+                        <label
+                            class="login-label"
+                            :class="{
+                                'login-label--error': validationErrors.email || error?.email,
+                            }"
+                        >
                             Email
                         </label>
-                        <Input v-model="form.email" type="email" placeholder="Ketik Email Kamu"
-                            :error-message="validationErrors.email || error?.email" :icon="IconProfileSecondaryGreen"
-                            :filled-icon="IconProfileBlack" />
+                        <Input
+                            v-model="form.email"
+                            type="email"
+                            placeholder="Ketik Email Kamu"
+                            :error-message="validationErrors.email || error?.email"
+                            :icon="IconProfileSecondaryGreen"
+                            :filled-icon="IconProfileBlack"
+                        />
                     </div>
 
                     <!-- Password -->
                     <div class="login-field-group">
-                        <label class="login-label"
-                            :class="{ 'login-label--error': validationErrors.password || error?.password }">
+                        <label
+                            class="login-label"
+                            :class="{
+                                'login-label--error': validationErrors.password || error?.password,
+                            }"
+                        >
                             Password
                         </label>
-                        <Input v-model="form.password" type="password" placeholder="Ketik Password Kamu"
-                            :error-message="validationErrors.password || error?.password" :icon="IconKeySecondaryGreen"
-                            :filled-icon="IconKeyBlack" />
+                        <Input
+                            v-model="form.password"
+                            type="password"
+                            placeholder="Ketik Password Kamu"
+                            :error-message="validationErrors.password || error?.password"
+                            :icon="IconKeySecondaryGreen"
+                            :filled-icon="IconKeyBlack"
+                        />
                     </div>
 
                     <!-- Submit -->
@@ -163,29 +185,37 @@ const handleSubmit = async () => {
 
             <!-- Footer -->
             <footer class="login-footer">
-                <span class="login-footer-text">&copy; {{ new Date().getFullYear() }} Desa Digital</span>
+                <span class="login-footer-text"
+                    >&copy; {{ new Date().getFullYear() }} Desa Digital</span
+                >
             </footer>
         </div>
 
         <!-- Right Panel: Banner -->
         <div class="login-panel-right">
             <div class="login-banner">
-                <img src="@/assets/images/backgrounds/bg-signin.png" class="login-banner-img" alt="Dashboard preview" />
+                <img
+                    src="@/assets/images/backgrounds/bg-signin.png"
+                    class="login-banner-img"
+                    alt="Dashboard preview"
+                />
                 <!-- Testimonial overlay -->
                 <div class="login-testimonial">
                     <p class="login-testimonial-quote">
-                        "Platform Desa Digital sangat membantu kami mengelola data desa secara efisien.
-                        Semua informasi tersentralisasi dan mudah diakses."
+                        "Platform Desa Digital sangat membantu kami mengelola data desa secara
+                        efisien. Semua informasi tersentralisasi dan mudah diakses."
                     </p>
                     <div class="login-testimonial-author">
                         <div class="login-testimonial-avatar">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M12 12C14.76 12 17 9.76 17 7C17 4.24 14.76 2 12 2C9.24 2 7 4.24 7 7C7 9.76 9.24 12 12 12Z"
-                                    fill="currentColor" />
+                                    fill="currentColor"
+                                />
                                 <path
                                     d="M12 14.5C6.99 14.5 2.91 17.86 2.91 22C2.91 22.28 3.13 22.5 3.41 22.5H20.59C20.87 22.5 21.09 22.28 21.09 22C21.09 17.86 17.01 14.5 12 14.5Z"
-                                    fill="currentColor" />
+                                    fill="currentColor"
+                                />
                             </svg>
                         </div>
                         <div class="login-testimonial-info">
@@ -511,7 +541,6 @@ const handleSubmit = async () => {
 
 /* ───────── Reduced Motion ───────── */
 @media (prefers-reduced-motion: reduce) {
-
     .login-banner-img,
     .login-testimonial {
         animation: none;

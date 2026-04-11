@@ -21,8 +21,10 @@ defineProps({
     },
 })
 
-const fallbackThumbnail = new URL('@/assets/images/thumbnails/kk-bansos-1.png', import.meta.url).href
-const fallbackProfilePicture = new URL('@/assets/images/photos/kk-photo-1.png', import.meta.url).href
+const fallbackThumbnail = new URL('@/assets/images/thumbnails/kk-bansos-1.png', import.meta.url)
+    .href
+const fallbackProfilePicture = new URL('@/assets/images/photos/kk-photo-1.png', import.meta.url)
+    .href
 
 function normalizeImageUrl(value, fallback) {
     if (!value) {
@@ -81,10 +83,12 @@ function getStatusConfig(status) {
         },
     }
 
-    return map[status] ?? {
-        label: ucfirst(status ?? 'Unknown'),
-        className: 'bg-desa-black',
-    }
+    return (
+        map[status] ?? {
+            label: ucfirst(status ?? 'Unknown'),
+            className: 'bg-desa-black',
+        }
+    )
 }
 </script>
 
@@ -95,65 +99,73 @@ function getStatusConfig(status) {
             <div class="flex items-center justify-between gap-4">
                 <p class="flex items-center gap-1 min-w-0">
                     <img src="@/assets/images/icons/calendar-2-secondary-green.svg" class="flex size-[18px] shrink-0"
-                        alt="icon">
-                    <span class="font-medium text-sm text-desa-secondary truncate">{{ formatCreatedAt(item.created_at)
+                        alt="icon" />
+                    <span class="font-medium text-sm text-desa-secondary truncate">{{
+                        formatCreatedAt(item.created_at)
                     }}</span>
                 </p>
-                <div class="badge rounded-full p-3 gap-2 flex w-[100px] justify-center shrink-0"
+                <div class="badge rounded-full p-3 gap-2 flex w -[100px] justify-center shrink-0"
                     :class="getStatusConfig(item.status).className">
-                    <span class="font-semibold text-xs text-white uppercase">{{ getStatusConfig(item.status).label
+                    <span class="font-semibold text-xs text-white uppercase">{{
+                        getStatusConfig(item.status).label
                     }}</span>
                 </div>
             </div>
 
-            <hr class="border-desa-background">
+            <hr class="border-desa-background" />
 
             <div class="flex items-center w-full gap-6">
                 <div class="flex w-[100px] h-20 shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
                     <img :src="getThumbnail(item.social_assistance?.thumbnail)" class="w-full h-full object-cover"
-                        alt="thumbnail" @error="handleImageError($event, fallbackThumbnail)">
+                        alt="thumbnail" @error="handleImageError($event, fallbackThumbnail)" />
                 </div>
                 <div class="flex flex-col gap-[6px] w-full min-w-0">
-                    <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">{{ item.social_assistance?.name ||
-                        '-' }}</p>
+                    <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">
+                        {{ item.social_assistance?.name || '-' }}
+                    </p>
                     <p class="flex items-center gap-1 min-w-0">
                         <img src="@/assets/images/icons/briefcase-secondary-green.svg" class="flex size-[18px] shrink-0"
-                            alt="icon">
+                            alt="icon" />
                         <span class="font-medium text-sm text-desa-secondary truncate">{{
-                            item.social_assistance?.provider || '-' }}</span>
+                            item.social_assistance?.provider || '-'
+                        }}</span>
                     </p>
                 </div>
                 <div class="flex items-center gap-3 shrink-0">
                     <div class="flex flex-col gap-1 text-right">
-                        <p class="font-semibold text-lg leading-5 text-desa-dark-green text-nowrap">{{
-                            formatRupiah(item.social_assistance?.amount || 0) }}</p>
-                        <p class="font-medium text-sm text-desa-secondary">{{
-                            formatCategory(item.social_assistance?.category) }}</p>
+                        <p class="font-semibold text-lg leading-5 text-desa-dark-green text-nowrap">
+                            {{ formatRupiah(item.social_assistance?.amount || 0) }}
+                        </p>
+                        <p class="font-medium text-sm text-desa-secondary">
+                            {{ formatCategory(item.social_assistance?.category) }}
+                        </p>
                     </div>
                     <div
                         class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                        <img src="@/assets/images/icons/money-dark-green.svg" class="flex size-6 shrink-0" alt="icon">
+                        <img src="@/assets/images/icons/money-dark-green.svg" class="flex size-6 shrink-0" alt="icon" />
                     </div>
                 </div>
             </div>
 
-            <hr class="border-desa-background">
+            <hr class="border-desa-background" />
 
             <div class="flex items-center gap-6 justify-between">
                 <div class="flex items-center gap-3 w-[302px] shrink-0 min-w-0">
                     <div class="flex size-[54px] rounded-full bg-desa-foreshadow overflow-hidden shrink-0">
                         <img :src="getProfilePicture(item.head_of_family?.profile_picture)"
                             class="w-full h-full object-cover" alt="photo"
-                            @error="handleImageError($event, fallbackProfilePicture)">
+                            @error="handleImageError($event, fallbackProfilePicture)" />
                     </div>
                     <div class="flex flex-col gap-1 min-w-0">
-                        <p class="font-semibold text-lg leading-5 text-desa-black truncate">{{
-                            item.head_of_family?.user?.name || '-' }}</p>
+                        <p class="font-semibold text-lg leading-5 text-desa-black truncate">
+                            {{ item.head_of_family?.user?.name || '-' }}
+                        </p>
                         <p class="flex items-center gap-1 min-w-0">
                             <img src="@/assets/images/icons/briefcase-secondary-green.svg"
-                                class="flex size-[18px] shrink-0" alt="icon">
+                                class="flex size-[18px] shrink-0" alt="icon" />
                             <span class="font-medium text-sm text-desa-secondary truncate">{{
-                                item.head_of_family?.occupation || '-' }}</span>
+                                item.head_of_family?.occupation || '-'
+                            }}</span>
                         </p>
                     </div>
                 </div>
@@ -162,21 +174,23 @@ function getStatusConfig(status) {
                     <div
                         class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
                         <img src="@/assets/images/icons/receive-square-2-dark-green.svg" class="flex size-6 shrink-0"
-                            alt="icon">
+                            alt="icon" />
                     </div>
                     <div class="flex flex-col gap-1">
-                        <p class="font-semibold text-lg leading-5 text-desa-dark-green text-nowrap">{{
-                            formatRupiah(item.amount || 0) }}</p>
+                        <p class="font-semibold text-lg leading-5 text-desa-dark-green text-nowrap">
+                            {{ formatRupiah(item.amount || 0) }}
+                        </p>
                         <p class="font-medium text-sm text-desa-secondary">Nominal Pengajuan</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3 justify-end w-[252px] shrink-0">
-                    <RouterLink v-if="item.id"
-                        :to="{ name: 'manage-social-assistance-recipient', params: { id: item.id } }"
-                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
-                        <span class="font-medium text-white" v-if="user?.role === 'admin'">Kelola Bansos</span>
-                        <span class="font-medium text-white" v-else>Lihat Bansos</span>
+                    <RouterLink v-if="item.id" :to="{
+                        name: 'manage-social-assistance-recipient',
+                        params: { id: item.id },
+                    }" class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
+                        <span class="font-medium text-white">{{ user?.role === 'admin' ? 'Manage' : 'View Details'
+                        }}</span>
                     </RouterLink>
                     <div v-else
                         class="rounded-2xl bg-desa-foreshadow px-4 py-3 text-sm font-medium text-desa-secondary">

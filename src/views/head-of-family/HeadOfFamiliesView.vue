@@ -83,50 +83,97 @@ onBeforeUnmount(() => {
     <div class="flex flex-col gap-4">
         <div id="Header" class="flex items-center justify-between">
             <h1 class="font-semibold text-2xl">Kepala Rumah</h1>
-            <RouterLink :to="{ name: 'create-head-of-family' }"
-                class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-dark-green">
-                <img src="@/assets/images/icons/add-square-white.svg" class="flex size-6 shrink-0" alt="icon" />
+            <RouterLink
+                :to="{ name: 'create-head-of-family' }"
+                class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-dark-green"
+            >
+                <img
+                    src="@/assets/images/icons/add-square-white.svg"
+                    class="flex size-6 shrink-0"
+                    alt="icon"
+                />
                 <p class="font-medium text-white">Add New</p>
             </RouterLink>
         </div>
         <section id="List-Kepala-Rumah" class="flex flex-col gap-[14px]">
-            <div v-if="success"
+            <div
+                v-if="success"
                 class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-2xl relative mb-4"
-                role="alert">
+                role="alert"
+            >
                 <span class="block sm:inline">{{ success }}</span>
 
-                <button type="button" class="absolute top-1/2 -translate-y-1/2 right-4" @click="success = null">
-                    <img src="@/assets/images/icons/close-circle-secondary-green.svg" class="flex size-6 shrink-0"
-                        alt="icon" />
+                <button
+                    type="button"
+                    class="absolute top-1/2 -translate-y-1/2 right-4"
+                    @click="success = null"
+                >
+                    <img
+                        src="@/assets/images/icons/close-circle-secondary-green.svg"
+                        class="flex size-6 shrink-0"
+                        alt="icon"
+                    />
                 </button>
             </div>
 
-            <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-2xl relative mb-4"
-                role="alert">
+            <div
+                v-if="error"
+                class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-2xl relative mb-4"
+                role="alert"
+            >
                 <span class="block sm:inline">{{ error }}</span>
 
-                <button type="button" class="absolute top-1/2 -translate-y-1/2 right-4" @click="error = null">
-                    <img src="@/assets/images/icons/close-circle-white.svg" class="flex size-6 shrink-0" alt="icon" />
+                <button
+                    type="button"
+                    class="absolute top-1/2 -translate-y-1/2 right-4"
+                    @click="error = null"
+                >
+                    <img
+                        src="@/assets/images/icons/close-circle-white.svg"
+                        class="flex size-6 shrink-0"
+                        alt="icon"
+                    />
                 </button>
             </div>
-            <form id="Page-Search" class="flex items-center justify-between" @submit.prevent="handleSearch">
+            <form
+                id="Page-Search"
+                class="flex items-center justify-between"
+                @submit.prevent="handleSearch"
+            >
                 <div class="flex flex-col gap-3 w-[370px] shrink-0">
                     <label class="relative group peer w-full valid">
-                        <input v-model="filters.search" type="text" placeholder="Cari nama Kepala Rumah atau NIK"
-                            class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 pl-12 pr-6 gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300" />
-                        <div class="absolute transform -translate-y-1/2 top-1/2 left-4 flex size-6 shrink-0">
-                            <img src="@/assets/images/icons/user-search-secondary-green.svg"
-                                class="size-6 hidden group-has-[:placeholder-shown]:flex" alt="icon" />
-                            <img src="@/assets/images/icons/user-search-black.svg"
-                                class="size-6 flex group-has-[:placeholder-shown]:hidden" alt="icon" />
+                        <input
+                            v-model="filters.search"
+                            type="text"
+                            placeholder="Cari nama Kepala Rumah atau NIK"
+                            class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 pl-12 pr-6 gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300"
+                        />
+                        <div
+                            class="absolute transform -translate-y-1/2 top-1/2 left-4 flex size-6 shrink-0"
+                        >
+                            <img
+                                src="@/assets/images/icons/user-search-secondary-green.svg"
+                                class="size-6 hidden group-has-[:placeholder-shown]:flex"
+                                alt="icon"
+                            />
+                            <img
+                                src="@/assets/images/icons/user-search-black.svg"
+                                class="size-6 flex group-has-[:placeholder-shown]:hidden"
+                                alt="icon"
+                            />
                         </div>
                     </label>
                 </div>
                 <div class="options flex items-center gap-4">
                     <span class="font-medium leading-5">Show</span>
                     <div class="relative">
-                        <select v-model="serverOptions.row_per_page" @change="handleSearch()" name="" id=""
-                            class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 px-6 pr-[52px] gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300">
+                        <select
+                            v-model="serverOptions.row_per_page"
+                            @change="handleSearch()"
+                            name=""
+                            id=""
+                            class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 px-6 pr-[52px] gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300"
+                        >
                             <option value="5" selected>5 Entries</option>
                             <option value="10">10 Entries</option>
                             <option value="20">20 Entries</option>
@@ -134,34 +181,54 @@ onBeforeUnmount(() => {
                             <option value="40">40 Entries</option>
                             <option value="50">50 Entries</option>
                         </select>
-                        <img src="@/assets/images/icons/arrow-down-black.svg"
+                        <img
+                            src="@/assets/images/icons/arrow-down-black.svg"
                             class="flex size-6 shrink-0 absolute transform -translate-y-1/2 top-1/2 right-6"
-                            alt="icon" />
+                            alt="icon"
+                        />
                     </div>
-                    <button type="button"
-                        class="flex items-center gap-1 h-14 w-fit rounded-2xl border border-desa-background bg-white py-4 px-6">
-                        <img src="@/assets/images/icons/filter-black.svg" class="flex size-6 shrink-0" alt="icon" />
+                    <button
+                        type="button"
+                        class="flex items-center gap-1 h-14 w-fit rounded-2xl border border-desa-background bg-white py-4 px-6"
+                    >
+                        <img
+                            src="@/assets/images/icons/filter-black.svg"
+                            class="flex size-6 shrink-0"
+                            alt="icon"
+                        />
                         <span class="font-medium leading-5">Filter</span>
                     </button>
                 </div>
             </form>
 
-            <div v-if="loading && headOfFamilies.length"
-                class="inline-flex w-fit items-center gap-2 rounded-full border border-desa-foreshadow bg-white px-4 py-2 text-sm text-desa-secondary">
+            <div
+                v-if="loading && headOfFamilies.length"
+                class="inline-flex w-fit items-center gap-2 rounded-full border border-desa-foreshadow bg-white px-4 py-2 text-sm text-desa-secondary"
+            >
                 <span class="loading-dot size-2 rounded-full bg-desa-soft-green"></span>
                 Memuat ulang data kepala rumah
             </div>
 
             <template v-if="!loading">
-                <CardList v-for="headOfFamily in headOfFamilies" :key="headOfFamily.id" :item="headOfFamily" />
+                <CardList
+                    v-for="headOfFamily in headOfFamilies"
+                    :key="headOfFamily.id"
+                    :item="headOfFamily"
+                />
             </template>
 
             <div v-else class="flex flex-col gap-[14px]">
-                <div v-for="index in skeletonRows" :key="index" class="hof-skeleton-card rounded-3xl p-6"
-                    :style="{ '--skeleton-delay': `${index * 90}ms` }">
+                <div
+                    v-for="index in skeletonRows"
+                    :key="index"
+                    class="hof-skeleton-card rounded-3xl p-6"
+                    :style="{ '--skeleton-delay': `${index * 90}ms` }"
+                >
                     <div class="flex items-center justify-between gap-6">
                         <div class="flex w-[260px] items-center gap-3">
-                            <div class="hof-skeleton-block hof-skeleton-avatar size-16 shrink-0 rounded-full"></div>
+                            <div
+                                class="hof-skeleton-block hof-skeleton-avatar size-16 shrink-0 rounded-full"
+                            ></div>
                             <div class="flex flex-1 flex-col gap-[6px]">
                                 <div class="hof-skeleton-block h-5 w-40 rounded-full"></div>
                                 <div class="flex items-center gap-2">
@@ -180,7 +247,8 @@ onBeforeUnmount(() => {
                         </div>
 
                         <div
-                            class="hof-skeleton-pill flex w-[224px] shrink-0 items-center gap-2 rounded-full px-4 py-[14px]">
+                            class="hof-skeleton-pill flex w-[224px] shrink-0 items-center gap-2 rounded-full px-4 py-[14px]"
+                        >
                             <div class="hof-skeleton-block size-[18px] rounded-full"></div>
                             <div class="hof-skeleton-block h-4 w-28 rounded-full"></div>
                         </div>
@@ -201,8 +269,12 @@ onBeforeUnmount(() => {
                 </div>
             </div>
 
-            <PaginationUI v-if="!loading" :meta="meta" :server-options="serverOptions"
-                @update:server-options="handleUpdateServerOptions" />
+            <PaginationUI
+                v-if="!loading"
+                :meta="meta"
+                :server-options="serverOptions"
+                @update:server-options="handleUpdateServerOptions"
+            />
         </section>
     </div>
 </template>
@@ -257,12 +329,14 @@ onBeforeUnmount(() => {
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.08) 12%,
-            rgba(255, 255, 255, 0.6) 50%,
-            rgba(255, 255, 255, 0.08) 88%,
-            transparent 100%);
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.08) 12%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.08) 88%,
+        transparent 100%
+    );
     animation: shimmer 1.9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
     animation-delay: var(--skeleton-delay, 0ms);
 }
@@ -278,7 +352,6 @@ onBeforeUnmount(() => {
 }
 
 @keyframes pulse {
-
     0%,
     100% {
         opacity: 0.4;
@@ -290,7 +363,6 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
     .hof-skeleton-block::after,
     .hof-skeleton-card::after,
     .hof-skeleton-pagination::after,

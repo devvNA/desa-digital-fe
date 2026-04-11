@@ -1,70 +1,83 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue'
 
 const props = defineProps({
     modelValue: {
         type: String,
-        default: '09:00'
-    }
-});
+        default: '09:00',
+    },
+})
 
-const emit = defineEmits(['update:modelValue', 'close']);
+const emit = defineEmits(['update:modelValue', 'close'])
 
-const mode = ref('hour');
-const hour = ref(13);
-const minute = ref(0);
+const mode = ref('hour')
+const hour = ref(13)
+const minute = ref(0)
 
 // Inisialisasi waktu dari props (form) saat komponen dimuat
 onMounted(() => {
     if (props.modelValue) {
-        const [h, m] = props.modelValue.split(':');
-        hour.value = parseInt(h);
-        minute.value = parseInt(m);
+        const [h, m] = props.modelValue.split(':')
+        hour.value = parseInt(h)
+        minute.value = parseInt(m)
     }
-});
+})
 
-const outerHours = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
-const innerHours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-const minutes = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 0];
+const outerHours = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+const innerHours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+const minutes = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 0]
 
-const formattedHour = computed(() => (hour.value === 24 ? 0 : hour.value).toString().padStart(2, '0'));
-const formattedMinute = computed(() => minute.value.toString().padStart(2, '0'));
+const formattedHour = computed(() =>
+    (hour.value === 24 ? 0 : hour.value).toString().padStart(2, '0'),
+)
+const formattedMinute = computed(() => minute.value.toString().padStart(2, '0'))
 
 const getPosition = (index, total, radius) => {
-    const angle = ((index - 2) * (Math.PI * 2)) / total;
-    return { left: `calc(50% + ${Math.cos(angle) * radius}px)`, top: `calc(50% + ${Math.sin(angle) * radius}px)` };
-};
+    const angle = ((index - 2) * (Math.PI * 2)) / total
+    return {
+        left: `calc(50% + ${Math.cos(angle) * radius}px)`,
+        top: `calc(50% + ${Math.sin(angle) * radius}px)`,
+    }
+}
 
 const handStyle = computed(() => {
-    let radius = mode.value === 'hour' && hour.value >= 1 && hour.value <= 12 ? 65 : 100;
-    let rotation = mode.value === 'hour' ? hour.value * 30 : minute.value * 6;
-    return { height: `${radius}px`, transform: `rotate(${rotation}deg)` };
-});
+    let radius = mode.value === 'hour' && hour.value >= 1 && hour.value <= 12 ? 65 : 100
+    let rotation = mode.value === 'hour' ? hour.value * 30 : minute.value * 6
+    return { height: `${radius}px`, transform: `rotate(${rotation}deg)` }
+})
 
 const selectHour = (h) => {
-    hour.value = h;
-    setTimeout(() => mode.value = 'minute', 300);
-};
+    hour.value = h
+    setTimeout(() => (mode.value = 'minute'), 300)
+}
 
-const selectMinute = (m) => minute.value = m;
+const selectMinute = (m) => (minute.value = m)
 
 // Mengirim nilai kembali ke form dan menutup modal
 const handleConfirm = () => {
-    const timeString = `${formattedHour.value}:${formattedMinute.value}`;
-    emit('update:modelValue', timeString);
-    emit('close');
-};
+    const timeString = `${formattedHour.value}:${formattedMinute.value}`
+    emit('update:modelValue', timeString)
+    emit('close')
+}
 </script>
 
 <template>
     <div class="time-picker-card">
         <div class="time-header">
             <div class="time-display">
-                <span class="time-segment" :class="{ active: mode === 'hour' }" @click="mode = 'hour'">
+                <span
+                    class="time-segment"
+                    :class="{ active: mode === 'hour' }"
+                    @click="mode = 'hour'"
+                >
                     {{ formattedHour }}
                 </span>
                 <span class="colon">:</span>
-                <span class="time-segment" :class="{ active: mode === 'minute' }" @click="mode = 'minute'">
+                <span
+                    class="time-segment"
+                    :class="{ active: mode === 'minute' }"
+                    @click="mode = 'minute'"
+                >
                     {{ formattedMinute }}
                 </span>
             </div>
@@ -78,20 +91,37 @@ const handleConfirm = () => {
                 </div>
 
                 <div v-if="mode === 'hour'" class="clock-numbers">
-                    <div v-for="(h, index) in outerHours" :key="'outer-' + h" class="clock-number"
-                        :class="{ selected: hour === h }" :style="getPosition(index, 12, 100)" @click="selectHour(h)">
+                    <div
+                        v-for="(h, index) in outerHours"
+                        :key="'outer-' + h"
+                        class="clock-number"
+                        :class="{ selected: hour === h }"
+                        :style="getPosition(index, 12, 100)"
+                        @click="selectHour(h)"
+                    >
                         {{ h === 24 ? '00' : h }}
                     </div>
-                    <div v-for="(h, index) in innerHours" :key="'inner-' + h" class="clock-number inner"
-                        :class="{ selected: hour === h }" :style="getPosition(index, 12, 65)" @click="selectHour(h)">
+                    <div
+                        v-for="(h, index) in innerHours"
+                        :key="'inner-' + h"
+                        class="clock-number inner"
+                        :class="{ selected: hour === h }"
+                        :style="getPosition(index, 12, 65)"
+                        @click="selectHour(h)"
+                    >
                         {{ h }}
                     </div>
                 </div>
 
                 <div v-else class="clock-numbers">
-                    <div v-for="(m, index) in minutes" :key="'min-' + m" class="clock-number"
-                        :class="{ selected: minute === m }" :style="getPosition(index, 12, 100)"
-                        @click="selectMinute(m)">
+                    <div
+                        v-for="(m, index) in minutes"
+                        :key="'min-' + m"
+                        class="clock-number"
+                        :class="{ selected: minute === m }"
+                        :style="getPosition(index, 12, 100)"
+                        @click="selectMinute(m)"
+                    >
                         {{ m === 0 ? '00' : m }}
                     </div>
                 </div>
@@ -131,8 +161,7 @@ const handleConfirm = () => {
 }
 
 .time-header {
-    background:
-        linear-gradient(135deg, rgba(52, 97, 58, 0.98), rgba(73, 124, 80, 0.98));
+    background: linear-gradient(135deg, rgba(52, 97, 58, 0.98), rgba(73, 124, 80, 0.98));
     color: white;
     padding: 28px 24px 24px;
     text-align: center;
@@ -157,7 +186,10 @@ const handleConfirm = () => {
     opacity: 0.54;
     padding: 2px 8px;
     border-radius: 14px;
-    transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    transition:
+        opacity 0.2s ease,
+        background-color 0.2s ease,
+        transform 0.2s ease;
 }
 
 .time-segment:hover {
@@ -183,8 +215,11 @@ const handleConfirm = () => {
 .clock-face {
     width: 250px;
     height: 250px;
-    background:
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.96) 0%, rgba(242, 249, 246, 1) 74%);
+    background: radial-gradient(
+        circle at center,
+        rgba(255, 255, 255, 0.96) 0%,
+        rgba(242, 249, 246, 1) 74%
+    );
     border: 1px solid rgba(52, 97, 58, 0.08);
     border-radius: 50%;
     position: relative;
@@ -213,7 +248,9 @@ const handleConfirm = () => {
     width: 2px;
     background: linear-gradient(180deg, rgba(52, 97, 58, 0.24), rgba(52, 97, 58, 0.96));
     transform-origin: bottom center;
-    transition: height 0.28s ease, transform 0.28s ease;
+    transition:
+        height 0.28s ease,
+        transform 0.28s ease;
     z-index: 1;
 }
 
@@ -322,7 +359,6 @@ const handleConfirm = () => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
     .time-segment,
     .clock-hand,
     .clock-number,

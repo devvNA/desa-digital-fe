@@ -68,5 +68,47 @@ export const useProfileStore = defineStore("profile", {
                 this.loading = false;
             }
         },
+        async updateProfile(id, payload) {
+            this.loading = true;
+            this.error = null;
+            this.success = null;
+            try {
+                const formData = new FormData();
+
+                formData.append("_method", "PUT");
+                formData.append("name", payload.name ?? "");
+                formData.append("address", payload.address ?? "");
+                formData.append("about", payload.about ?? "");
+                formData.append("headman", payload.headman ?? "");
+                formData.append("people", payload.people ?? "");
+                formData.append("agricultural_area", payload.agricultural_area ?? "");
+                formData.append("total_area", payload.total_area ?? "");
+
+                if (payload.thumbnail instanceof File) {
+                    formData.append("thumbnail", payload.thumbnail);
+                }
+
+                payload.images?.forEach((image) => {
+                    if (image instanceof File) {
+                        formData.append("images[]", image);
+                    }
+                });
+
+                const response = await axiosInstance.post(`/profile`, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+
+                this.profile = response.data.data;
+                this.success = response.data.message;
+                return this.profile;
+            } catch (error) {
+                this.error = handleError(error);
+                return null;
+            } finally {
+                this.loading = false;
+            }
+        },
     },
 });

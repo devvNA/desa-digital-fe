@@ -1,12 +1,12 @@
 <script setup>
 import CardList from '@/components/development/CardList.vue'
 import PaginationUI from '@/components/ui/PaginationUI.vue'
+import { can } from '@/helpers/permissionHelper'
 import { useDevelopmentStore } from '@/stores/development'
 import { storeToRefs } from 'pinia'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
-const router = useRouter()
 const developmentStore = useDevelopmentStore()
 const { developments, meta, loading, success, error } = storeToRefs(developmentStore)
 const { fetchDevelopmentsPaginated } = developmentStore
@@ -27,7 +27,6 @@ let shouldSkipSearchWatcher = false
 const skeletonRows = computed(() => Math.max(4, Number(serverOptions.value.row_per_page) || 4))
 const hasDevelopments = computed(() => developments.value.length > 0)
 const hasActiveFilters = computed(() => Boolean(filters.value.search))
-const hasCreateDevelopmentRoute = computed(() => router.hasRoute('create-development'))
 const isInitialLoading = computed(() => loading.value && !hasDevelopments.value)
 const isRefreshing = computed(() => loading.value && hasDevelopments.value)
 const emptyStateMessage = computed(() => {
@@ -151,9 +150,9 @@ onBeforeUnmount(() => {
     <div class="flex flex-col gap-4">
         <div id="Header" class="flex items-center justify-between">
             <h1 class="text-2xl font-semibold">Pembangunan Desa</h1>
-            <RouterLink v-if="hasCreateDevelopmentRoute" :to="{ name: 'create-development' }"
+            <RouterLink v-if="can('development-create')" :to="{ name: 'create-development' }"
                 class="flex items-center gap-[10px] rounded-2xl bg-desa-dark-green px-6 py-4">
-                <img src="@/assets/images/icons/add-square-white.svg" class="flex size-6 shrink-0" alt="add icon">
+                <img src="@/assets/images/icons/add-square-white.svg" class="flex size-6 shrink-0" alt="add icon" />
                 <p class="font-medium text-white">Add New</p>
             </RouterLink>
         </div>
@@ -165,7 +164,7 @@ onBeforeUnmount(() => {
                 <span class="block sm:inline">{{ success }}</span>
                 <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2" @click="success = null">
                     <img src="@/assets/images/icons/close-circle-secondary-green.svg" class="flex size-6 shrink-0"
-                        alt="close success alert">
+                        alt="close success alert" />
                 </button>
             </div>
 
@@ -178,7 +177,7 @@ onBeforeUnmount(() => {
                     </button>
                     <button type="button" @click="error = null">
                         <img src="@/assets/images/icons/close-circle-white.svg" class="flex size-6 shrink-0"
-                            alt="close error alert">
+                            alt="close error alert" />
                     </button>
                 </div>
             </div>
@@ -187,12 +186,12 @@ onBeforeUnmount(() => {
                 <div class="flex w-[370px] shrink-0 flex-col gap-3">
                     <label class="relative group peer w-full valid">
                         <input v-model="filters.search" type="text" placeholder="Cari nama pembangunan desa"
-                            class="h-14 w-full appearance-none rounded-2xl py-4 pl-12 pr-6 font-medium outline-none ring-[1.5px] ring-desa-background transition-all duration-300 placeholder:text-desa-secondary focus:ring-desa-black">
+                            class="h-14 w-full appearance-none rounded-2xl py-4 pl-12 pr-6 font-medium outline-none ring-[1.5px] ring-desa-background transition-all duration-300 placeholder:text-desa-secondary focus:ring-desa-black" />
                         <div class="absolute left-4 top-1/2 flex size-6 shrink-0 -translate-y-1/2 transform">
                             <img src="@/assets/images/icons/box-search-secondary-green.svg"
-                                class="hidden size-6 group-has-[:placeholder-shown]:flex" alt="search icon inactive">
+                                class="hidden size-6 group-has-[:placeholder-shown]:flex" alt="search icon inactive" />
                             <img src="@/assets/images/icons/box-search-black.svg"
-                                class="flex size-6 group-has-[:placeholder-shown]:hidden" alt="search icon active">
+                                class="flex size-6 group-has-[:placeholder-shown]:hidden" alt="search icon active" />
                         </div>
                     </label>
                 </div>
@@ -211,13 +210,13 @@ onBeforeUnmount(() => {
                             </select>
                             <img src="@/assets/images/icons/arrow-down-black.svg"
                                 class="absolute right-6 top-1/2 flex size-6 shrink-0 -translate-y-1/2 transform"
-                                alt="dropdown icon">
+                                alt="dropdown icon" />
                         </div>
                     </div>
                     <button type="button" @click="resetFilters"
                         class="flex h-14 w-fit items-center gap-1 rounded-2xl border border-desa-background bg-white px-6 py-4">
                         <img src="@/assets/images/icons/filter-black.svg" class="flex size-6 shrink-0"
-                            alt="reset filter icon">
+                            alt="reset filter icon" />
                         <span class="font-medium leading-5">Reset</span>
                     </button>
                 </div>

@@ -1,5 +1,7 @@
 <script setup>
 import { formatRupiah, ucfirst } from '@/helpers/format'
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
 
 defineProps({
     socialAssistances: {
@@ -15,6 +17,9 @@ defineProps({
         default: 4,
     },
 })
+
+const authStore = useAuthStore()
+const { user } = storeToRefs(authStore)
 
 const fallbackImage = new URL('@/assets/images/thumbnails/kk-bansos-1.png', import.meta.url).href
 
@@ -41,43 +46,53 @@ function formatCategory(value) {
                     <img :src="getThumbnail(item.thumbnail)" class="w-full h-full object-cover" alt="thumbnail" />
                 </div>
                 <div class="ml-4 mr-9 flex w-full flex-col gap-[6px]">
-                    <p class="line-clamp-1 text-lg font-semibold leading-[22.5px]">{{ item.name }}</p>
+                    <p class="line-clamp-1 text-lg font-semibold leading-[22.5px]">
+                        {{ item.name }}
+                    </p>
                     <p class="flex items-center gap-1">
                         <img src="@/assets/images/icons/briefcase-secondary-green.svg" class="flex size-[18px] shrink-0"
                             alt="icon" />
-                        <span class="text-sm font-medium text-desa-secondary">{{ item.provider || '-' }}</span>
+                        <span class="text-sm font-medium text-desa-secondary">{{
+                            item.provider || '-'
+                            }}</span>
                     </p>
                 </div>
                 <div class="shrink-0">
                     <RouterLink :to="{ name: 'manage-social-assistance', params: { id: item.id } }"
                         class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
-                        <span class="font-medium text-white">Manage</span>
+                        <span class="font-medium text-white">{{ user?.role === "admin" ? 'Manage' :
+                            'View Detail' }}</span>
                     </RouterLink>
                 </div>
             </div>
 
-            <hr class="border-desa-background">
+            <hr class="border-desa-background" />
 
             <div class="grid grid-cols-3 gap-3">
                 <div class="flex items-center gap-3">
                     <div
                         class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                        <img src="@/assets/images/icons/money-dark-green.svg" class="flex size-6 shrink-0" alt="icon">
+                        <img src="@/assets/images/icons/money-dark-green.svg" class="flex size-6 shrink-0" alt="icon" />
                     </div>
                     <div class="flex flex-col gap-1">
-                        <p class="font-semibold text-lg leading-5 text-desa-dark-green">{{ formatRupiah(item.amount ||
-                            0) }}</p>
-                        <p class="font-medium text-sm text-desa-secondary">{{ formatCategory(item.category) }}</p>
+                        <p class="font-semibold text-lg leading-5 text-desa-dark-green">
+                            {{ formatRupiah(item.amount || 0) }}
+                        </p>
+                        <p class="font-medium text-sm text-desa-secondary">
+                            {{ formatCategory(item.category) }}
+                        </p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3">
                     <div
                         class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-blue/10 overflow-hidden">
-                        <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0" alt="icon">
+                        <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
+                            alt="icon" />
                     </div>
                     <div class="flex flex-col gap-1">
-                        <p class="font-semibold text-lg leading-5 text-desa-blue">{{ item.recipients_count || 0 }} Warga
+                        <p class="font-semibold text-lg leading-5 text-desa-blue">
+                            {{ item.recipients_count || 0 }} Warga
                         </p>
                         <p class="font-medium text-sm text-desa-secondary">Total Pengajuan</p>
                     </div>
@@ -87,9 +102,9 @@ function formatCategory(value) {
                     <div class="flex size-[52px] rounded-2xl items-center justify-center overflow-hidden"
                         :class="item.is_available ? 'bg-desa-foreshadow' : 'bg-desa-red/10'">
                         <img v-if="item.is_available" src="@/assets/images/icons/tick-square-dark-green.svg"
-                            class="flex size-6 shrink-0" alt="icon">
+                            class="flex size-6 shrink-0" alt="icon" />
                         <img v-else src="@/assets/images/icons/minus-square-red.svg" class="flex size-6 shrink-0"
-                            alt="icon">
+                            alt="icon" />
                     </div>
                     <div class="flex flex-col gap-1">
                         <p class="font-semibold text-lg leading-5"
@@ -101,8 +116,7 @@ function formatCategory(value) {
                 </div>
             </div>
 
-            <p class="text-sm leading-6 text-desa-secondary">{{ item.description || '-' }}
-            </p>
+            <p class="text-sm leading-6 text-desa-secondary">{{ item.description || '-' }}</p>
         </div>
 
         <div v-if="!socialAssistances.length" class="rounded-3xl bg-white p-8 text-center text-desa-secondary">

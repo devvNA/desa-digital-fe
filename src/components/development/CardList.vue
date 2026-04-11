@@ -52,13 +52,15 @@ const hasDevelopments = computed(() => props.developments.length > 0)
             <div class="flex items-center w-full gap-4">
                 <div class="flex h-20 w-[100px] shrink-0 overflow-hidden rounded-2xl bg-desa-foreshadow">
                     <img :src="getThumbnail(item.thumbnail)" class="h-full w-full object-cover"
-                        alt="development thumbnail" @error="handleImageError($event, fallbackThumbnail)">
+                        alt="development thumbnail" @error="handleImageError($event, fallbackThumbnail)" />
                 </div>
                 <div class="mr-9 flex w-full flex-col gap-[6px]">
-                    <p class="line-clamp-1 text-lg font-semibold leading-[22.5px]">{{ item.name }}</p>
+                    <p class="line-clamp-1 text-lg font-semibold leading-[22.5px]">
+                        {{ item.name }}
+                    </p>
                     <div class="flex items-center gap-1">
                         <img src="@/assets/images/icons/user-square-secondary-green.svg"
-                            class="flex size-[18px] shrink-0" alt="person in charge icon">
+                            class="flex size-[18px] shrink-0" alt="person in charge icon" />
                         <p class="text-sm font-medium text-desa-secondary">
                             Penanggung Jawab:
                             <span class="text-base font-medium text-desa-dark-green">
@@ -69,24 +71,26 @@ const hasDevelopments = computed(() => props.developments.length > 0)
                 </div>
                 <div>
                     <RouterLink :to="{ name: 'manage-development', params: { id: item.id } }"
-                        class="flex shrink-0 items-center gap-[10px] rounded-2xl bg-desa-black px-6 py-4">
-                        <span v-if="user?.role === 'admin'" class="font-medium text-white">Manage</span>
-                        <span v-else class="font-medium text-white">View Details</span>
+                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
+                        <span class="font-medium text-white">{{ user?.role === 'admin' ? 'Manage' : 'View Details'
+                            }}</span>
                     </RouterLink>
                 </div>
             </div>
 
-            <hr class="border-desa-background">
+            <hr class="border-desa-background" />
 
             <div class="grid grid-cols-3 gap-3">
                 <div class="flex items-center gap-3">
                     <div
                         class="flex size-[52px] items-center justify-center overflow-hidden rounded-2xl bg-desa-red/10">
                         <img src="@/assets/images/icons/wallet-3-red.svg" class="flex size-6 shrink-0"
-                            alt="budget icon">
+                            alt="budget icon" />
                     </div>
                     <div class="flex flex-col gap-1">
-                        <p class="text-lg font-semibold leading-5 text-desa-red">{{ formatRupiah(item.amount) }}</p>
+                        <p class="text-lg font-semibold leading-5 text-desa-red">
+                            {{ formatRupiah(item.amount) }}
+                        </p>
                         <p class="text-sm font-medium text-desa-secondary">Dana Pembangunan</p>
                     </div>
                 </div>
@@ -94,11 +98,12 @@ const hasDevelopments = computed(() => props.developments.length > 0)
                     <div
                         class="flex size-[52px] items-center justify-center overflow-hidden rounded-2xl bg-desa-blue/10">
                         <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
-                            alt="applicant icon">
+                            alt="applicant icon" />
                     </div>
                     <div class="flex flex-col gap-1">
-                        <p class="text-lg font-semibold leading-5 text-desa-blue">{{
-                            getApplicantCountLabel(item.applicants_count) }}</p>
+                        <p class="text-lg font-semibold leading-5 text-desa-blue">
+                            {{ getApplicantCountLabel(item.applicants_count) }}
+                        </p>
                         <p class="text-sm font-medium text-desa-secondary">Total Pelamar</p>
                     </div>
                 </div>
@@ -106,11 +111,12 @@ const hasDevelopments = computed(() => props.developments.length > 0)
                     <div
                         class="flex size-[52px] items-center justify-center overflow-hidden rounded-2xl bg-desa-foreshadow">
                         <img src="@/assets/images/icons/calendar-2-dark-green.svg" class="flex size-6 shrink-0"
-                            alt="calendar icon">
+                            alt="calendar icon" />
                     </div>
                     <div class="flex flex-col gap-1">
-                        <p class="text-lg font-semibold leading-5 text-desa-dark-green">{{
-                            getExecutionDateLabel(item.start_date) }}</p>
+                        <p class="text-lg font-semibold leading-5 text-desa-dark-green">
+                            {{ getExecutionDateLabel(item.start_date) }}
+                        </p>
                         <p class="text-sm font-medium text-desa-secondary">Tanggal Pelaksanaan</p>
                     </div>
                 </div>

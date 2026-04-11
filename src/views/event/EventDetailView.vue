@@ -1,5 +1,6 @@
 <script setup>
 import { formatDateWithDay, formatRupiah } from '@/helpers/format'
+import { can } from '@/helpers/permissionHelper'
 import { useEventStore } from '@/stores/event'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted } from 'vue'
@@ -11,7 +12,8 @@ const eventStore = useEventStore()
 const { event, success, error } = storeToRefs(eventStore)
 
 const fallbackImage = new URL('@/assets/images/thumbnails/kk-event-1.png', import.meta.url).href
-const fallbackProfilePicture = new URL('@/assets/images/photos/kk-photo-1.png', import.meta.url).href
+const fallbackProfilePicture = new URL('@/assets/images/photos/kk-photo-1.png', import.meta.url)
+    .href
 const detail = computed(() => event.value ?? {})
 const recentParticipants = computed(() => detail.value.recent_participants ?? [])
 
@@ -52,8 +54,6 @@ function formatAvailability(value) {
 onMounted(() => {
     fetchData()
 })
-
-
 </script>
 
 <template>
@@ -62,20 +62,19 @@ onMounted(() => {
             <div class="flex flex-col gap-2">
                 <div class="flex gap-1 items-center leading-5 text-desa-secondary">
                     <router-link :to="{ name: 'event' }"
-                        class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize">Event
-                        Desa
+                        class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize">Event Desa
                     </router-link>
                     <span>/</span>
-                    <p class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize ">
-                        Detail Event
-                        Desa</p>
+                    <p class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize">
+                        Detail Event Desa
+                    </p>
                 </div>
                 <h1 class="font-semibold text-2xl">Detail Event Desa</h1>
             </div>
             <router-link :to="{ name: 'edit-event', params: { id: detail.id } }"
-                class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-black">
+                class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-black" v-if="can('event-edit')">
                 <p class="font-medium text-white">Ubah Data</p>
-                <img src="@/assets/images/icons/edit-white.svg" class="flex size-6 shrink-0" alt="icon">
+                <img src="@/assets/images/icons/edit-white.svg" class="flex size-6 shrink-0" alt="icon" />
             </router-link>
         </div>
         <div v-if="success" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-2xl relative"
@@ -108,85 +107,75 @@ onMounted(() => {
                     </div>
                     <div class="flex flex-col gap-[6px] w-full ml-4 mr-9">
                         <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">
-                            {{ detail.name }}</p>
+                            {{ detail.name }}
+                        </p>
                         <div class="flex items-center gap-1">
                             <img src="@/assets/images/icons/ticket-secondary-green.svg"
-                                class="flex size-[18px] shrink-0" alt="icon">
+                                class="flex size-[18px] shrink-0" alt="icon" />
                             <p class="font-medium text-sm text-desa-secondary">
                                 Registration:
                                 <span class="font-medium text-base" :class="{
                                     'text-desa-dark-green': detail.is_active,
                                     'text-desa-red': !detail.is_active,
                                 }">
-                                    {{
-                                        formatAvailability(detail.is_active)
-                                    }}
+                                    {{ formatAvailability(detail.is_active) }}
                                 </span>
                             </p>
                         </div>
                     </div>
                 </div>
-                <hr class="border-desa-foreshadow">
+                <hr class="border-desa-foreshadow" />
                 <div class="flex items-center w-full gap-3">
                     <div class="flex size-[52px] shrink-0 rounded-2xl bg-desa-red/10 items-center justify-center">
-                        <img src="@/assets/images/icons/ticket-2-red.svg" class="flex size-6 shrink-0" alt="icon">
+                        <img src="@/assets/images/icons/ticket-2-red.svg" class="flex size-6 shrink-0" alt="icon" />
                     </div>
                     <div class="flex flex-col gap-1 w-full">
                         <p class="font-semibold text-lg leading-[22.5px] text-desa-red">
-                            {{ formatRupiah(detail.price)
-                            }}
+                            {{ formatRupiah(detail.price) }}
                         </p>
-                        <span class="font-medium text-desa-secondary">
-                            Harga Event
-                        </span>
+                        <span class="font-medium text-desa-secondary"> Harga Event </span>
                     </div>
                 </div>
-                <hr class="border-desa-foreshadow">
+                <hr class="border-desa-foreshadow" />
                 <div class="flex items-center w-full gap-3">
                     <div class="flex size-[52px] shrink-0 rounded-2xl bg-desa-blue/10 items-center justify-center">
-                        <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0" alt="icon">
+                        <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
+                            alt="icon" />
                     </div>
                     <div class="flex flex-col gap-1 w-full">
                         <p class="font-semibold text-lg leading-[22.5px] text-desa-blue">
                             {{ detail.participants_count }}
                             Orang
                         </p>
-                        <span class="font-medium text-desa-secondary">
-                            Total Partisipasi
-                        </span>
+                        <span class="font-medium text-desa-secondary"> Total Partisipasi </span>
                     </div>
                 </div>
-                <hr class="border-desa-foreshadow">
+                <hr class="border-desa-foreshadow" />
                 <div class="flex items-center w-full gap-3">
                     <div class="flex size-[52px] shrink-0 rounded-2xl bg-desa-foreshadow items-center justify-center">
                         <img src="@/assets/images/icons/calendar-2-dark-green.svg" class="flex size-6 shrink-0"
-                            alt="icon">
+                            alt="icon" />
                     </div>
                     <div class="flex flex-col gap-1 w-full">
                         <p class="font-semibold text-lg leading-[22.5px] text-desa-dark-green">
-                            {{
-                                formatDateWithDay(detail.date) }}</p>
-                        <span class="font-medium text-desa-secondary">
-                            Tanggal Pelaksaaan
-                        </span>
+                            {{ formatDateWithDay(detail.date) }}
+                        </p>
+                        <span class="font-medium text-desa-secondary"> Tanggal Pelaksaaan </span>
                     </div>
                 </div>
-                <hr class="border-desa-foreshadow">
+                <hr class="border-desa-foreshadow" />
                 <div class="flex items-center w-full gap-3">
                     <div class="flex size-[52px] shrink-0 rounded-2xl bg-desa-yellow/10 items-center justify-center">
-                        <img src="@/assets/images/icons/clock-yellow.svg" class="flex size-6 shrink-0" alt="icon">
+                        <img src="@/assets/images/icons/clock-yellow.svg" class="flex size-6 shrink-0" alt="icon" />
                     </div>
                     <div class="flex flex-col gap-1 w-full">
                         <p class="font-semibold text-lg leading-[22.5px] text-desa-yellow">
-                            {{
-                                detail.time }} WIB
+                            {{ detail.time }} WIB
                         </p>
-                        <span class="font-medium text-desa-secondary">
-                            Waktu Pelaksaaan
-                        </span>
+                        <span class="font-medium text-desa-secondary"> Waktu Pelaksaaan </span>
                     </div>
                 </div>
-                <hr class="border-desa-foreshadow">
+                <hr class="border-desa-foreshadow" />
                 <div class="flex flex-col gap-3">
                     <p class="font-medium text-sm text-desa-secondary">Tentang Event</p>
                     <p class="font-medium leading-8">{{ detail.description }}</p>
@@ -203,16 +192,18 @@ onMounted(() => {
                         </div>
                         <div class="flex flex-col gap-1">
                             <p class="font-semibold text-lg leading-5 text-desa-black">
-                                {{ value.name }}</p>
+                                {{ value.name }}
+                            </p>
                             <p class="flex items-center gap-1">
                                 <img src="@/assets/images/icons/briefcase-secondary-green.svg"
-                                    class="flex size-[18px] shrink-0" alt="icon">
+                                    class="flex size-[18px] shrink-0" alt="icon" />
                                 <span class="font-medium text-sm text-desa-secondary">{{
-                                    value.occupation }}</span>
+                                    value.occupation
+                                }}</span>
                             </p>
                         </div>
                     </div>
-                    <hr class="border-desa-background">
+                    <hr class="border-desa-background" />
                 </div>
                 <a href="#"
                     class="flex items-center justify-center h-14 rounded-2xl py-4 px-6 gap-[10px] bg-desa-dark-green">

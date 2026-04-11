@@ -30,6 +30,7 @@ const EventEditView = () => import("@/views/event/EventEditView.vue");
 const EventDetailView = () => import("@/views/event/EventDetailView.vue");
 const ProfileView = () => import("@/views/profile/ProfileView.vue");
 const ProfileCreateView = () => import("@/views/profile/ProfileCreateView.vue");
+const ProfileEditView = () => import("@/views/profile/ProfileEditView.vue");
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -157,6 +158,12 @@ const router = createRouter({
                     name: "create-profile",
                     component: ProfileCreateView,
                     meta: { requiresAuth: true, permission: "profile-create" },
+                },
+                {
+                    path: "profile/edit/:id",
+                    name: "edit-profile",
+                    component: ProfileEditView,
+                    meta: { requiresAuth: true, permission: "profile-edit" },
                 },
             ],
         },

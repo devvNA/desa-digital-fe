@@ -1,6 +1,7 @@
 <script setup>
 import CardList from '@/components/social-assistance/CardList.vue'
 import PaginationUI from '@/components/ui/PaginationUI.vue'
+import { can } from '@/helpers/permissionHelper'
 import { useSocialAssistanceStore } from '@/stores/socialAssistance'
 import { storeToRefs } from 'pinia'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -76,7 +77,6 @@ onBeforeUnmount(() => {
         clearTimeout(searchDebounceId)
     }
 })
-
 </script>
 
 <template>
@@ -84,8 +84,9 @@ onBeforeUnmount(() => {
         <div id="Header" class="flex items-center justify-between">
             <h1 class="font-semibold text-2xl">List Bantuan Sosial</h1>
             <router-link :to="{ name: 'create-social-assistance' }"
-                class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-dark-green">
-                <img src="@/assets/images/icons/add-square-white.svg" class="flex size-6 shrink-0" alt="icon">
+                class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-dark-green"
+                v-if="can('social-assistance-create')">
+                <img src="@/assets/images/icons/add-square-white.svg" class="flex size-6 shrink-0" alt="icon" />
                 <p class="font-medium text-white">Add New</p>
             </router-link>
         </div>
@@ -96,7 +97,7 @@ onBeforeUnmount(() => {
                 <span class="block sm:inline">{{ success }}</span>
                 <button type="button" class="absolute top-1/2 -translate-y-1/2 right-4" @click="success = null">
                     <img src="@/assets/images/icons/close-circle-secondary-green.svg" class="flex size-6 shrink-0"
-                        alt="icon">
+                        alt="icon" />
                 </button>
             </div>
 
@@ -104,7 +105,7 @@ onBeforeUnmount(() => {
                 role="alert">
                 <span class="block sm:inline">{{ error }}</span>
                 <button type="button" class="absolute top-1/2 -translate-y-1/2 right-4" @click="error = null">
-                    <img src="@/assets/images/icons/close-circle-white.svg" class="flex size-6 shrink-0" alt="icon">
+                    <img src="@/assets/images/icons/close-circle-white.svg" class="flex size-6 shrink-0" alt="icon" />
                 </button>
             </div>
 
@@ -112,12 +113,12 @@ onBeforeUnmount(() => {
                 <div class="flex flex-col gap-3 w-[370px] shrink-0">
                     <label class="relative group peer w-full valid">
                         <input v-model="filters.search" type="text" placeholder="Cari nama bantuan sosial"
-                            class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 pl-12 pr-6 gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300">
+                            class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 pl-12 pr-6 gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300" />
                         <div class="absolute transform -translate-y-1/2 top-1/2 left-4 flex size-6 shrink-0">
                             <img src="@/assets/images/icons/receipt-search-secondary-green.svg"
-                                class="size-6 hidden group-has-[:placeholder-shown]:flex" alt="icon">
+                                class="size-6 hidden group-has-[:placeholder-shown]:flex" alt="icon" />
                             <img src="@/assets/images/icons/receipt-search-black.svg"
-                                class="size-6 flex group-has-[:placeholder-shown]:hidden" alt="icon">
+                                class="size-6 flex group-has-[:placeholder-shown]:hidden" alt="icon" />
                         </div>
                     </label>
                 </div>
@@ -136,12 +137,12 @@ onBeforeUnmount(() => {
                             </select>
                             <img src="@/assets/images/icons/arrow-down-black.svg"
                                 class="flex size-6 shrink-0 absolute transform -translate-y-1/2 top-1/2 right-6"
-                                alt="icon">
+                                alt="icon" />
                         </div>
                     </div>
                     <button type="button"
                         class="flex items-center gap-1 h-14 w-fit rounded-2xl border border-desa-background bg-white py-4 px-6">
-                        <img src="@/assets/images/icons/filter-black.svg" class="flex size-6 shrink-0" alt="icon">
+                        <img src="@/assets/images/icons/filter-black.svg" class="flex size-6 shrink-0" alt="icon" />
                         <span class="font-medium leading-5">Filter</span>
                     </button>
                 </div>

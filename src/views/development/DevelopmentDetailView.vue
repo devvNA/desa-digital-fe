@@ -1,56 +1,58 @@
 <script setup>
-import ModalDelete from '@/components/ui/ModalDelete.vue';
-import { mapDevelopmentResponse } from '@/helpers/development';
-import { formatDate, formatRupiah, formatToClientTimezone } from '@/helpers/format';
-import { fallbackThumbnail, handleImageError } from '@/helpers/socialAssistance';
-import router from '@/router';
-import { useDevelopmentStore } from '@/stores/development';
-import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import ModalDelete from '@/components/ui/ModalDelete.vue'
+import { mapDevelopmentResponse } from '@/helpers/development'
+import { formatDate, formatRupiah, formatToClientTimezone } from '@/helpers/format'
+import { can } from '@/helpers/permissionHelper'
+import { fallbackThumbnail, handleImageError } from '@/helpers/socialAssistance'
+import router from '@/router'
+import { useDevelopmentStore } from '@/stores/development'
+import { storeToRefs } from 'pinia'
+import { computed, onMounted, ref } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 
-const route = useRoute();
+const route = useRoute()
 
 // ── Store ────────────────────────────────────────────────────────
-const developmentStore = useDevelopmentStore();
-const { loading, error, success } = storeToRefs(developmentStore);
+const developmentStore = useDevelopmentStore()
+const { loading, error, success } = storeToRefs(developmentStore)
+
 
 // ── Reactive state ───────────────────────────────────────────────
-const development = ref(null);
-const showModalDelete = ref(false);
-const activeTab = ref('all');
+const development = ref(null)
+const showModalDelete = ref(false)
+const activeTab = ref('all')
 
 const filteredApplicants = computed(() => {
-    const applicants = development.value?.development_applicants ?? [];
-    if (activeTab.value === 'all') return applicants;
-    return applicants.filter((a) => a.status === activeTab.value);
-});
+    const applicants = development.value?.development_applicants ?? []
+    if (activeTab.value === 'all') return applicants
+    return applicants.filter((a) => a.status === activeTab.value)
+})
 
 // ── Data fetching ────────────────────────────────────────────────
 async function fetchData() {
-    const response = await developmentStore.fetchDevelopment(route.params.id);
-    if (!response) return;
-    development.value = mapDevelopmentResponse(response, route.params.id);
+    const response = await developmentStore.fetchDevelopment(route.params.id)
+    if (!response) return
+    development.value = mapDevelopmentResponse(response, route.params.id)
 }
 
 // ── Actions ──────────────────────────────────────────────────────
 async function handleDelete() {
-    const result = await developmentStore.deleteDevelopment(route.params.id);
+    const result = await developmentStore.deleteDevelopment(route.params.id)
     if (result) {
-        await router.replace({ name: 'development' });
+        await router.replace({ name: 'development' })
     }
 }
 
 async function handleApplicantStatus(applicantId, status) {
-    await developmentStore.updateApplicantStatus(applicantId, status);
-    await fetchData();
+    await developmentStore.updateApplicantStatus(applicantId, status)
+    await fetchData()
 }
 
 function onImageError(event) {
-    handleImageError(event, fallbackThumbnail);
+    handleImageError(event, fallbackThumbnail)
 }
 
-onMounted(fetchData);
+onMounted(fetchData)
 </script>
 
 <template>
@@ -59,25 +61,27 @@ onMounted(fetchData);
             <div class="flex flex-col gap-2">
                 <div class="flex gap-1 items-center leading-5 text-desa-secondary">
                     <router-link :to="{ name: 'development' }"
-                        class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize">Pembangunan
-                        Desa
+                        class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize">Pembangunan Desa
                     </router-link>
                     <span>/</span>
-                    <p class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize">Detail
-                        Pembangunan Desa</p>
+                    <p class="last-of-type:text-desa-dark-green last-of-type:font-semibold capitalize">
+                        Detail Pembangunan Desa
+                    </p>
                 </div>
                 <h1 class="font-semibold text-2xl">Detail Pembangunan Desa</h1>
             </div>
             <div class="flex items-center gap-3">
                 <button @click="showModalDelete = true"
-                    class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-red">
+                    class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-red"
+                    v-if="can('development-delete')">
                     <p class="font-medium text-white">Hapus Data</p>
-                    <img src="@/assets/images/icons/trash-white.svg" class="flex size-6 shrink-0" alt="icon">
+                    <img src="@/assets/images/icons/trash-white.svg" class="flex size-6 shrink-0" alt="icon" />
                 </button>
                 <router-link :to="{ name: 'edit-development', params: { id: development.id } }"
-                    class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-black">
+                    class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-black"
+                    v-if="can('development-edit')">
                     <p class="font-medium text-white">Ubah Data</p>
-                    <img src="@/assets/images/icons/edit-white.svg" class="flex size-6 shrink-0" alt="icon">
+                    <img src="@/assets/images/icons/edit-white.svg" class="flex size-6 shrink-0" alt="icon" />
                 </router-link>
             </div>
         </div>
@@ -103,7 +107,7 @@ onMounted(fetchData);
                 <div class="flex items-center justify-between">
                     <div class="flex w-[120px] h-[100px] shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
                         <img :src="development.thumbnail_url" @error="onImageError" class="w-full h-full object-cover"
-                            alt="photo">
+                            alt="photo" />
                     </div>
                     <div class="badge rounded-full p-3 gap-2 flex justify-center shrink-0 bg-desa-yellow"
                         v-if="development.status === 'ongoing'">
@@ -115,7 +119,9 @@ onMounted(fetchData);
                     </div>
                 </div>
                 <div class="flex flex-col gap-[6px] w-full">
-                    <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">{{ development.name }}</p>
+                    <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">
+                        {{ development.name }}
+                    </p>
                     <p class="font-medium text-sm text-desa-secondary">
                         Penanggung Jawab:
                         <span class="font-medium text-base text-desa-dark-green">
@@ -123,35 +129,35 @@ onMounted(fetchData);
                         </span>
                     </p>
                 </div>
-                <hr class="border-desa-foreshadow">
+                <hr class="border-desa-foreshadow" />
                 <div class="flex items-center justify-between">
                     <div class="flex items-center w-full gap-3">
                         <div class="flex size-[52px] shrink-0 rounded-2xl bg-desa-red/10 items-center justify-center">
-                            <img src="@/assets/images/icons/wallet-3-red.svg" class="flex size-6 shrink-0" alt="icon">
+                            <img src="@/assets/images/icons/wallet-3-red.svg" class="flex size-6 shrink-0" alt="icon" />
                         </div>
                         <div class="flex flex-col gap-1 w-full">
-                            <p class="font-semibold text-xl leading-[22.5px] text-desa-red">{{
-                                formatRupiah(development.amount) }}</p>
-                            <span class="font-medium text-desa-secondary">
-                                Dana Pembangunan
-                            </span>
+                            <p class="font-semibold text-xl leading-[22.5px] text-desa-red">
+                                {{ formatRupiah(development.amount) }}
+                            </p>
+                            <span class="font-medium text-desa-secondary"> Dana Pembangunan </span>
                         </div>
                     </div>
                     <div class="badge rounded-full p-3 gap-2 flex w-[100px] justify-center shrink-0 bg-desa-dark-green">
                         <span class="font-semibold text-xs text-white uppercase">Tersedia</span>
                     </div>
                 </div>
-                <hr class="border-desa-foreshadow">
+                <hr class="border-desa-foreshadow" />
                 <div class="grid grid-cols-2 gap-3">
                     <div class="flex items-center w-full gap-3">
                         <div
                             class="flex size-[52px] shrink-0 rounded-2xl bg-desa-foreshadow items-center justify-center">
                             <img src="@/assets/images/icons/calendar-2-dark-green.svg" class="flex size-6 shrink-0"
-                                alt="icon">
+                                alt="icon" />
                         </div>
                         <div class="flex flex-col gap-1 w-full">
-                            <p class="font-semibold text-xl leading-[22.5px] text-desa-dark-green">{{
-                                formatDate(development.start_date) }}</p>
+                            <p class="font-semibold text-xl leading-[22.5px] text-desa-dark-green">
+                                {{ formatDate(development.start_date) }}
+                            </p>
                             <span class="font-medium text-desa-secondary">
                                 Tanggal Pelaksanaan
                             </span>
@@ -159,32 +165,30 @@ onMounted(fetchData);
                     </div>
                     <div class="flex items-center w-full gap-3 justify-end">
                         <div class="flex flex-col gap-1 w-full text-right">
-                            <p class="font-semibold text-xl leading-[22.5px] text-desa-dark-green">{{
-                                formatDate(development.end_date) }}</p>
-                            <span class="font-medium text-desa-secondary">
-                                Perkiraan Selesai
-                            </span>
+                            <p class="font-semibold text-xl leading-[22.5px] text-desa-dark-green">
+                                {{ formatDate(development.end_date) }}
+                            </p>
+                            <span class="font-medium text-desa-secondary"> Perkiraan Selesai </span>
                         </div>
                         <div
                             class="flex size-[52px] shrink-0 rounded-2xl bg-desa-foreshadow items-center justify-center">
                             <img src="@/assets/images/icons/calendar-2-dark-green.svg" class="flex size-6 shrink-0"
-                                alt="icon">
+                                alt="icon" />
                         </div>
                     </div>
                 </div>
-                <hr class="border-desa-foreshadow">
+                <hr class="border-desa-foreshadow" />
                 <div class="grid grid-cols-2 gap-3">
                     <div class="flex items-center w-full gap-3">
                         <div class="flex size-[52px] shrink-0 rounded-2xl bg-desa-blue/10 items-center justify-center">
                             <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
-                                alt="icon">
+                                alt="icon" />
                         </div>
                         <div class="flex flex-col gap-1 w-full">
-                            <p class="font-semibold text-xl leading-[22.5px] text-desa-blue">{{
-                                development.development_applicants?.length }}</p>
-                            <span class="font-medium text-desa-secondary">
-                                Total Pelamar
-                            </span>
+                            <p class="font-semibold text-xl leading-[22.5px] text-desa-blue">
+                                {{ development.development_applicants?.length }}
+                            </p>
+                            <span class="font-medium text-desa-secondary"> Total Pelamar </span>
                         </div>
                     </div>
                     <div class="flex items-center w-full gap-3 justify-end">
@@ -192,17 +196,15 @@ onMounted(fetchData);
                             <p class="font-semibold text-xl leading-[22.5px] text-desa-yellow">
                                 {{ development.day }} Hari
                             </p>
-                            <span class="font-medium text-desa-secondary">
-                                Days Needed
-                            </span>
+                            <span class="font-medium text-desa-secondary"> Days Needed </span>
                         </div>
                         <div
                             class="flex size-[52px] shrink-0 rounded-2xl bg-desa-yellow/10 items-center justify-center">
-                            <img src="@/assets/images/icons/clock-yellow.svg" class="flex size-6 shrink-0" alt="icon">
+                            <img src="@/assets/images/icons/clock-yellow.svg" class="flex size-6 shrink-0" alt="icon" />
                         </div>
                     </div>
                 </div>
-                <hr class="border-desa-foreshadow">
+                <hr class="border-desa-foreshadow" />
                 <div class="flex flex-col gap-3">
                     <p class="font-medium text-sm text-desa-secondary">Tentang Pembangunan</p>
                     <p class="font-medium leading-8">{{ development.description }}</p>
@@ -261,9 +263,10 @@ onMounted(fetchData);
                             <div class="flex items-center justify-between">
                                 <p class="flex items-center gap-1">
                                     <img src="@/assets/images/icons/calendar-2-secondary-green.svg"
-                                        class="flex size-[18px] shrink-0" alt="icon">
+                                        class="flex size-[18px] shrink-0" alt="icon" />
                                     <span class="font-medium text-sm text-desa-secondary">{{
-                                        formatToClientTimezone(applicant.created_at) }}</span>
+                                        formatToClientTimezone(applicant.created_at)
+                                    }}</span>
                                 </p>
                                 <div class="badge rounded-full p-3 gap-2 flex w-[100px] justify-center shrink-0 bg-desa-yellow"
                                     v-if="applicant.status === 'pending'">
@@ -278,27 +281,30 @@ onMounted(fetchData);
                                     <span class="font-semibold text-xs text-white uppercase">Ditolak</span>
                                 </div>
                             </div>
-                            <hr class="border-desa-background">
+                            <hr class="border-desa-background" />
                             <div class="flex items-center gap-6 justify-between">
                                 <div class="flex items-center gap-3 w-[302px] shrink-0">
                                     <div class="flex flex-col gap-1">
-                                        <p class="font-semibold text-lg leading-5 text-desa-black">{{
-                                            applicant.user.name }}</p>
+                                        <p class="font-semibold text-lg leading-5 text-desa-black">
+                                            {{ applicant.user.name }}
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 w-[236px] shrink-0">
                                     <div class="flex flex-col gap-1 w-full">
                                         <p class="flex items-center gap-1">
                                             <img src="@/assets/images/icons/keyboard-secondary-green.svg"
-                                                class="flex size-[18px] shrink-0" alt="icon">
+                                                class="flex size-[18px] shrink-0" alt="icon" />
                                             <span class="font-medium text-sm text-desa-secondary">EMAIL</span>
                                         </p>
                                         <p class="font-semibold text-sm leading-5 text-desa-dark-green truncate"
                                             :title="applicant.user.email">
-                                            {{ applicant.user.email }}</p>
+                                            {{ applicant.user.email }}
+                                        </p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-3 justify-end shrink-0">
+                                <div class="flex items-center gap-3 justify-end shrink-0"
+                                    v-if="applicant.status === 'pending' && can('development-edit') && can('development-applicant-edit')">
                                     <button @click="handleApplicantStatus(applicant.id, 'rejected')"
                                         :disabled="applicant.status !== 'pending' || loading"
                                         class="flex items-center w-[120px] justify-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-red/10 disabled:opacity-50 disabled:cursor-not-allowed">

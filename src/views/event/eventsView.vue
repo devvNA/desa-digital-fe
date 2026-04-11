@@ -1,6 +1,7 @@
 <script setup>
 import CardList from '@/components/event/CardList.vue'
 import PaginationUI from '@/components/ui/PaginationUI.vue'
+import { can } from '@/helpers/permissionHelper'
 import { useEventStore } from '@/stores/event'
 import { storeToRefs } from 'pinia'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -151,46 +152,88 @@ onBeforeUnmount(() => {
     <div class="flex flex-col gap-4">
         <div id="Header" class="flex items-center justify-between">
             <h1 class="font-semibold text-2xl">Events Desa</h1>
-            <RouterLink v-if="hasCreateEventRoute" :to="{ name: 'create-event' }"
-                class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-dark-green">
-                <img src="@/assets/images/icons/add-square-white.svg" class="flex size-6 shrink-0" alt="icon">
+            <RouterLink
+                v-if="hasCreateEventRoute && can('event-create')"
+                :to="{ name: 'create-event' }"
+                class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-dark-green"
+            >
+                <img
+                    src="@/assets/images/icons/add-square-white.svg"
+                    class="flex size-6 shrink-0"
+                    alt="icon"
+                />
                 <p class="font-medium text-white">Add New</p>
             </RouterLink>
         </div>
         <section id="List-Event-Desa" class="flex flex-col gap-[14px]">
-            <div v-if="success"
+            <div
+                v-if="success"
                 class="relative mb-4 rounded-2xl border border-green-400 bg-green-100 px-4 py-3 text-green-700"
-                role="alert">
+                role="alert"
+            >
                 <span class="block sm:inline">{{ success }}</span>
-                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2" @click="success = null">
-                    <img src="@/assets/images/icons/close-circle-secondary-green.svg" class="flex size-6 shrink-0"
-                        alt="close success alert">
+                <button
+                    type="button"
+                    class="absolute right-4 top-1/2 -translate-y-1/2"
+                    @click="success = null"
+                >
+                    <img
+                        src="@/assets/images/icons/close-circle-secondary-green.svg"
+                        class="flex size-6 shrink-0"
+                        alt="close success alert"
+                    />
                 </button>
             </div>
 
-            <div v-if="generalError"
-                class="relative mb-4 rounded-2xl border border-red-400 bg-red-100 px-4 py-3 text-red-700" role="alert">
+            <div
+                v-if="generalError"
+                class="relative mb-4 rounded-2xl border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+                role="alert"
+            >
                 <span class="block sm:inline">{{ generalError }}</span>
                 <div class="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-2">
-                    <button type="button" class="text-sm font-semibold text-red-700 underline" @click="fetchData">
+                    <button
+                        type="button"
+                        class="text-sm font-semibold text-red-700 underline"
+                        @click="fetchData"
+                    >
                         Coba lagi
                     </button>
                     <button type="button" @click="error = null">
-                        <img src="@/assets/images/icons/close-circle-white.svg" class="flex size-6 shrink-0"
-                            alt="close error alert">
+                        <img
+                            src="@/assets/images/icons/close-circle-white.svg"
+                            class="flex size-6 shrink-0"
+                            alt="close error alert"
+                        />
                     </button>
                 </div>
             </div>
-            <form id="Page-Search" class="flex items-center justify-between" @submit.prevent="handleSearch">
+            <form
+                id="Page-Search"
+                class="flex items-center justify-between"
+                @submit.prevent="handleSearch"
+            >
                 <div class="flex flex-col gap-3 w-[370px] shrink-0">
                     <label class="relative group peer w-full valid">
-                        <input v-model="filters.search" type="text" placeholder="Cari nama event desa"
-                            class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 pl-12 pr-6 gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300">
-                        <div class="absolute transform -translate-y-1/2 top-1/2 left-4 flex size-6 shrink-0">
-                            <img src="@/assets/images/icons/calendar-search-secondary-green.svg"
-                                class="size-6 hidden group-has-[:placeholder-shown]:flex" alt="icon">
-                            <img src="@/assets/images/icons/calendar-search-black.svg"
-                                class="size-6 flex group-has-[:placeholder-shown]:hidden" alt="icon">
+                        <input
+                            v-model="filters.search"
+                            type="text"
+                            placeholder="Cari nama event desa"
+                            class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 pl-12 pr-6 gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300"
+                        />
+                        <div
+                            class="absolute transform -translate-y-1/2 top-1/2 left-4 flex size-6 shrink-0"
+                        >
+                            <img
+                                src="@/assets/images/icons/calendar-search-secondary-green.svg"
+                                class="size-6 hidden group-has-[:placeholder-shown]:flex"
+                                alt="icon"
+                            />
+                            <img
+                                src="@/assets/images/icons/calendar-search-black.svg"
+                                class="size-6 flex group-has-[:placeholder-shown]:hidden"
+                                alt="icon"
+                            />
                         </div>
                     </label>
                 </div>
@@ -198,8 +241,13 @@ onBeforeUnmount(() => {
                     <div class="flex items-center gap-[10px]">
                         <span class="font-medium leading-5">Show</span>
                         <div class="relative">
-                            <select v-model="serverOptions.row_per_page" @change="handlePerPageChange" name="" id=""
-                                class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 px-6 pr-[52px] gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300">
+                            <select
+                                v-model="serverOptions.row_per_page"
+                                @change="handlePerPageChange"
+                                name=""
+                                id=""
+                                class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 px-6 pr-[52px] gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300"
+                            >
                                 <option value="5" selected>5 Entries</option>
                                 <option value="10">10 Entries</option>
                                 <option value="20">20 Entries</option>
@@ -207,37 +255,61 @@ onBeforeUnmount(() => {
                                 <option value="40">40 Entries</option>
                                 <option value="50">50 Entries</option>
                             </select>
-                            <img src="@/assets/images/icons/arrow-down-black.svg"
+                            <img
+                                src="@/assets/images/icons/arrow-down-black.svg"
                                 class="flex size-6 shrink-0 absolute transform -translate-y-1/2 top-1/2 right-6"
-                                alt="icon">
+                                alt="icon"
+                            />
                         </div>
-                        <div v-if="!isInitialLoading && !hasEvents && hasActiveFilters" class="flex justify-center">
-                            <button type="button" @click="resetFilters"
-                                class="inline-flex items-center rounded-2xl bg-desa-black px-5 py-3 text-sm font-medium text-white">
+                        <div
+                            v-if="!isInitialLoading && !hasEvents && hasActiveFilters"
+                            class="flex justify-center"
+                        >
+                            <button
+                                type="button"
+                                @click="resetFilters"
+                                class="inline-flex items-center rounded-2xl bg-desa-black px-5 py-3 text-sm font-medium text-white"
+                            >
                                 Reset pencarian
                             </button>
                         </div>
                     </div>
                 </div>
             </form>
-            <div v-if="isRefreshing"
-                class="inline-flex w-fit items-center gap-2 rounded-full border border-desa-foreshadow bg-white px-4 py-2 text-sm text-desa-secondary">
+            <div
+                v-if="isRefreshing"
+                class="inline-flex w-fit items-center gap-2 rounded-full border border-desa-foreshadow bg-white px-4 py-2 text-sm text-desa-secondary"
+            >
                 <span class="loading-dot size-2 rounded-full bg-desa-soft-green"></span>
                 Memuat ulang data pembangunan desa
             </div>
 
-            <CardList :events="events" :loading="isInitialLoading" :skeleton-rows="skeletonRows"
-                :empty-message="emptyStateMessage" />
+            <CardList
+                :events="events"
+                :loading="isInitialLoading"
+                :skeleton-rows="skeletonRows"
+                :empty-message="emptyStateMessage"
+            />
 
-            <div v-if="!isInitialLoading && !hasEvents && hasActiveFilters" class="flex justify-center">
-                <button type="button" @click="resetFilters"
-                    class="inline-flex items-center rounded-2xl bg-desa-black px-5 py-3 text-sm font-medium text-white">
+            <div
+                v-if="!isInitialLoading && !hasEvents && hasActiveFilters"
+                class="flex justify-center"
+            >
+                <button
+                    type="button"
+                    @click="resetFilters"
+                    class="inline-flex items-center rounded-2xl bg-desa-black px-5 py-3 text-sm font-medium text-white"
+                >
                     Reset pencarian
                 </button>
             </div>
 
-            <PaginationUI v-if="!isInitialLoading && hasEvents" :meta="meta" :server-options="serverOptions"
-                @update:server-options="handleUpdateServerOptions" />
+            <PaginationUI
+                v-if="!isInitialLoading && hasEvents"
+                :meta="meta"
+                :server-options="serverOptions"
+                @update:server-options="handleUpdateServerOptions"
+            />
         </section>
     </div>
 </template>
@@ -248,7 +320,6 @@ onBeforeUnmount(() => {
 }
 
 @keyframes pulse {
-
     0%,
     100% {
         opacity: 0.4;
