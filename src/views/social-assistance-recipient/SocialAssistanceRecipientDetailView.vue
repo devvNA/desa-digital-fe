@@ -20,7 +20,7 @@ import { useSocialAssistanceRecipientStore } from '@/stores/socialAssistanceReci
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import iconBriefcase from '@/assets/images/icons/briefcase-secondary-green.svg'
 import iconCalendar from '@/assets/images/icons/calendar-2-dark-green.svg'
@@ -37,6 +37,7 @@ import iconSendSquare from '@/assets/images/icons/send-square-white.svg'
 
 // ── Store & route ────────────────────────────────────────────────
 const route = useRoute()
+const router = useRouter()
 const store = useSocialAssistanceRecipientStore()
 const authStore = useAuthStore()
 const { socialAssistanceRecipient, loading, error, success } = storeToRefs(store)
@@ -94,6 +95,15 @@ function syncRecipientRequest(recipient = detail.value) {
 async function fetchData() {
     const recipient = await store.fetchSocialAssistanceRecipient(route.params.id)
     if (recipient) syncRecipientRequest(recipient)
+
+    if (route.query.submitted === '1') {
+        success.value = 'Pengajuan bantuan sosial berhasil dikirim.'
+        await router.replace({
+            name: route.name,
+            params: route.params,
+            query: {},
+        })
+    }
 }
 
 function openProofFilePicker() {
@@ -331,7 +341,7 @@ onBeforeUnmount(() => {
                             </div>
                             <div class="flex flex-col gap-1">
                                 <p class="font-semibold text-lg leading-[22.5px]">{{ formatCreatedAt(detail.created_at)
-                                    }}
+                                }}
                                 </p>
                                 <h3 class="font-medium text-sm leading-[17.5px] text-desa-secondary">Tanggal Pengajuan
                                 </h3>
@@ -527,8 +537,9 @@ onBeforeUnmount(() => {
                                 <p class="text-center w-[240px] font-medium text-xs leading-[19.2px] text-[#ACB9BB]">
                                     Gambar akan muncul jika status pengajuan sudah berhasil</p>
                             </div>
-                            <img src="" alt="image"
-                                class="bukti-menerima-bansos absolute left-0 top-0 w-full h-full object-cover" />
+                            <img :src="proofImage" alt="image"
+                                class="bukti-menerima-bansos absolute left-0 top-0 w-full h-full object-cover"
+                                v-if="proofImage" />
                         </div>
                     </section>
                 </div>

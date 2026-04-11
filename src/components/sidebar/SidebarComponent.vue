@@ -33,7 +33,7 @@ const sidebarItems = [
         path: '/family-member',
         iconActive: iconCrownActive,
         iconInactive: iconCrownInactive,
-        permission: 'family-member-menu',
+        permission: 'family-member-menu'
     },
     {
         label: 'Bantuan Sosial',

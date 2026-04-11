@@ -402,13 +402,13 @@ onBeforeUnmount(() => {
 
         <template v-else>
             <div id="Dashboard-admin" v-if="user?.role === 'admin'" class="flex flex-col gap-[14px]">
+                <div class="flex flex-col gap-1">
+                    <h1 class="font-semibold text-2xl">Desa Statistics</h1>
+                    <p class="text-sm text-desa-secondary">
+                        Ringkasan data utama desa tampil lebih rapi dan mudah dipantau.
+                    </p>
+                </div>
                 <div id="Row-1" class="flex gap-[14px]">
-                    <div class="flex flex-col gap-1">
-                        <h1 class="font-semibold text-2xl">Desa Statistics</h1>
-                        <p class="text-sm text-desa-secondary">
-                            Ringkasan data utama desa tampil lebih rapi dan mudah dipantau.
-                        </p>
-                    </div>
                     <div
                         class="flex flex-col w-[calc(389/1000*100%)] h-[358px] rounded-2xl p-6 gap-6 gradient-vertical">
                         <img src="@/assets/images/icons/gift-orange-background.svg" class="flex size-[86px] shrink-0"

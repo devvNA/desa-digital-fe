@@ -93,6 +93,53 @@ export const useSocialAssistanceRecipientStore = defineStore("socialAssistanceRe
             }
         },
 
+        async createSocialAssistanceRecipient(payload) {
+            this.loading = true;
+            this.error = null;
+            this.success = null;
+
+            try {
+                const formData = new FormData();
+
+                formData.append("social_assistance_id", payload.social_assistance_id ?? "");
+                formData.append("head_of_family_id", payload.head_of_family_id ?? "");
+                formData.append("bank", payload.bank ?? "");
+                formData.append("amount", payload.amount ?? "");
+                formData.append("reason", payload.reason ?? "");
+                formData.append("account_number", payload.account_number ?? "");
+
+                if (payload.status) {
+                    formData.append("status", payload.status);
+                }
+
+                if (payload.proof instanceof File) {
+                    formData.append("proof", payload.proof);
+                }
+
+                const response = await axiosInstance.post(
+                    "/social-assistance-recipient",
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    },
+                );
+
+                this.socialAssistanceRecipient = normalizeSocialAssistanceRecipient(
+                    response.data.data,
+                );
+                this.success = response.data.message;
+
+                return this.socialAssistanceRecipient;
+            } catch (error) {
+                this.error = handleError(error);
+                return null;
+            } finally {
+                this.loading = false;
+            }
+        },
+
         async updateSocialAssistanceRecipient(id, payload) {
             this.loading = true;
             this.error = null;
@@ -107,7 +154,10 @@ export const useSocialAssistanceRecipientStore = defineStore("socialAssistanceRe
                 formData.append("amount", payload.amount ?? "");
                 formData.append("reason", payload.reason ?? "");
                 formData.append("account_number", payload.account_number ?? "");
-                formData.append("status", payload.status ?? "");
+
+                if (payload.status) {
+                    formData.append("status", payload.status);
+                }
 
                 if (payload.proof instanceof File) {
                     formData.append("proof", payload.proof);
