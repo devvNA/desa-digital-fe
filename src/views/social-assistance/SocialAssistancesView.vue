@@ -1,0 +1,156 @@
+<script setup>
+import CardList from '@/components/social-assistance/CardList.vue'
+import PaginationUI from '@/components/ui/PaginationUI.vue'
+import { can } from '@/helpers/permissionHelper'
+import { useSocialAssistanceStore } from '@/stores/socialAssistance'
+import { storeToRefs } from 'pinia'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
+const socialAssistanceStore = useSocialAssistanceStore()
+const { socialAssistances, meta, loading, success, error } = storeToRefs(socialAssistanceStore)
+const { fetchSocialAssistancesPaginated } = socialAssistanceStore
+
+const serverOptions = ref({
+    page: 1,
+    row_per_page: 10,
+})
+
+const filters = ref({
+    search: null,
+})
+const searchDebounceDelay = 500
+let searchDebounceId = null
+
+const skeletonRows = computed(() => Math.max(4, Number(serverOptions.value.row_per_page) || 4))
+
+const fetchData = async () => {
+    await fetchSocialAssistancesPaginated({
+        ...serverOptions.value,
+        ...filters.value,
+    })
+}
+
+const handleSearch = async () => {
+    serverOptions.value = {
+        ...serverOptions.value,
+        page: 1,
+    }
+
+    const trimmedSearch = filters.value.search?.trim()
+    filters.value.search = trimmedSearch || null
+
+    await fetchData()
+}
+
+const handleUpdateServerOptions = async (options) => {
+    serverOptions.value = {
+        ...serverOptions.value,
+        ...options,
+    }
+
+    await fetchData()
+}
+
+const scheduleSearch = () => {
+    if (searchDebounceId) {
+        clearTimeout(searchDebounceId)
+    }
+
+    searchDebounceId = setTimeout(() => {
+        handleSearch()
+    }, searchDebounceDelay)
+}
+
+watch(
+    () => filters.value.search,
+    () => {
+        scheduleSearch()
+    },
+)
+
+onMounted(() => {
+    fetchData()
+})
+
+onBeforeUnmount(() => {
+    if (searchDebounceId) {
+        clearTimeout(searchDebounceId)
+    }
+})
+</script>
+
+<template>
+    <div class="flex flex-col gap-4">
+        <div id="Header" class="flex items-center justify-between">
+            <h1 class="font-semibold text-2xl">List Bantuan Sosial</h1>
+            <router-link :to="{ name: 'create-social-assistance' }"
+                class="flex items-center rounded-2xl py-4 px-6 gap-[10px] bg-desa-dark-green"
+                v-if="can('social-assistance-create')">
+                <img src="@/assets/images/icons/add-square-white.svg" class="flex size-6 shrink-0" alt="icon" />
+                <p class="font-medium text-white">Add New</p>
+            </router-link>
+        </div>
+        <section id="List-Bantuan-Sosial" class="flex flex-col gap-[14px]">
+            <div v-if="success"
+                class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-2xl relative mb-4"
+                role="alert">
+                <span class="block sm:inline">{{ success }}</span>
+                <button type="button" class="absolute top-1/2 -translate-y-1/2 right-4" @click="success = null">
+                    <img src="@/assets/images/icons/close-circle-secondary-green.svg" class="flex size-6 shrink-0"
+                        alt="icon" />
+                </button>
+            </div>
+
+            <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-2xl relative mb-4"
+                role="alert">
+                <span class="block sm:inline">{{ error }}</span>
+                <button type="button" class="absolute top-1/2 -translate-y-1/2 right-4" @click="error = null">
+                    <img src="@/assets/images/icons/close-circle-white.svg" class="flex size-6 shrink-0" alt="icon" />
+                </button>
+            </div>
+
+            <form id="Page-Search" class="flex items-center justify-between" @submit.prevent="handleSearch">
+                <div class="flex flex-col gap-3 w-[370px] shrink-0">
+                    <label class="relative group peer w-full valid">
+                        <input v-model="filters.search" type="text" placeholder="Cari nama bantuan sosial"
+                            class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 pl-12 pr-6 gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300" />
+                        <div class="absolute transform -translate-y-1/2 top-1/2 left-4 flex size-6 shrink-0">
+                            <img src="@/assets/images/icons/receipt-search-secondary-green.svg"
+                                class="size-6 hidden group-has-[:placeholder-shown]:flex" alt="icon" />
+                            <img src="@/assets/images/icons/receipt-search-black.svg"
+                                class="size-6 flex group-has-[:placeholder-shown]:hidden" alt="icon" />
+                        </div>
+                    </label>
+                </div>
+                <div class="options flex items-center gap-4">
+                    <div class="flex items-center gap-[10px]">
+                        <span class="font-medium leading-5">Show</span>
+                        <div class="relative">
+                            <select v-model="serverOptions.row_per_page" @change="handleSearch()" name="" id=""
+                                class="appearance-none outline-none w-full h-14 rounded-2xl ring-[1.5px] ring-desa-background focus:ring-desa-black py-4 px-6 pr-[52px] gap-2 font-medium placeholder:text-desa-secondary transition-all duration-300">
+                                <option value="5" selected>5 Entries</option>
+                                <option value="10">10 Entries</option>
+                                <option value="20">20 Entries</option>
+                                <option value="30">30 Entries</option>
+                                <option value="40">40 Entries</option>
+                                <option value="50">50 Entries</option>
+                            </select>
+                            <img src="@/assets/images/icons/arrow-down-black.svg"
+                                class="flex size-6 shrink-0 absolute transform -translate-y-1/2 top-1/2 right-6"
+                                alt="icon" />
+                        </div>
+                    </div>
+                    <button type="button"
+                        class="flex items-center gap-1 h-14 w-fit rounded-2xl border border-desa-background bg-white py-4 px-6">
+                        <img src="@/assets/images/icons/filter-black.svg" class="flex size-6 shrink-0" alt="icon" />
+                        <span class="font-medium leading-5">Filter</span>
+                    </button>
+                </div>
+            </form>
+            <CardList :socialAssistances="socialAssistances" :loading="loading" :skeletonRows="skeletonRows" />
+
+            <PaginationUI v-if="!loading" :meta="meta" :server-options="serverOptions"
+                @update:server-options="handleUpdateServerOptions" />
+        </section>
+    </div>
+</template>
