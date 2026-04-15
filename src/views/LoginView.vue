@@ -1,32 +1,53 @@
 <script setup>
-import IconKeyBlack from '@/assets/images/icons/key-black.svg'
-import IconKeySecondaryGreen from '@/assets/images/icons/key-secondary-green.svg'
-import IconProfileBlack from '@/assets/images/icons/profile-circle-black.svg'
-import IconProfileSecondaryGreen from '@/assets/images/icons/profile-circle-secondary-green.svg'
-import Button from '@/components/ui/Button.vue'
-import Input from '@/components/ui/Input.vue'
-import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import IconKeyBlack from "@/assets/images/icons/key-black.svg";
+import IconKeySecondaryGreen from "@/assets/images/icons/key-secondary-green.svg";
+import IconProfileBlack from "@/assets/images/icons/profile-circle-black.svg";
+import IconProfileSecondaryGreen from "@/assets/images/icons/profile-circle-secondary-green.svg";
+import Button from "@/components/ui/Button.vue";
+import Input from "@/components/ui/Input.vue";
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-const router = useRouter()
-const authStore = useAuthStore()
-const { loading, error } = storeToRefs(authStore)
+const router = useRouter();
+const authStore = useAuthStore();
+const { loading, error } = storeToRefs(authStore);
 
 const form = ref({
     // role: '',
-    email: '',
-    password: '',
-})
+    email: "",
+    password: "",
+});
 
-const validationErrors = ref({})
+const validationErrors = ref({});
+
+const toast = ref({
+    visible: false,
+    message: "",
+    timerId: null,
+});
+
+function showToast(message) {
+    if (toast.value.timerId) clearTimeout(toast.value.timerId);
+    toast.value.message = message;
+    toast.value.visible = true;
+    toast.value.timerId = setTimeout(dismissToast, 4000);
+}
+
+function dismissToast() {
+    toast.value.visible = false;
+    if (toast.value.timerId) {
+        clearTimeout(toast.value.timerId);
+        toast.value.timerId = null;
+    }
+}
 
 const handleSubmit = async () => {
-    validationErrors.value = {}
-    authStore.resetFeedback()
+    validationErrors.value = {};
+    authStore.resetFeedback();
 
-    let isValid = true
+    let isValid = true;
 
     // if (!form.value.role) {
     //     validationErrors.value.role = ['Pilih role kamu terlebih dahulu']
@@ -34,41 +55,41 @@ const handleSubmit = async () => {
     // }
 
     if (!form.value.email) {
-        validationErrors.value.email = ['Email Address harus diisi']
-        isValid = false
+        validationErrors.value.email = ["Email Address harus diisi"];
+        isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) {
-        validationErrors.value.email = ['Format Email tidak valid']
-        isValid = false
+        validationErrors.value.email = ["Format Email tidak valid"];
+        isValid = false;
     }
 
     if (!form.value.password) {
-        validationErrors.value.password = ['Password harus diisi']
-        isValid = false
+        validationErrors.value.password = ["Password harus diisi"];
+        isValid = false;
     } else if (form.value.password.length < 8) {
-        validationErrors.value.password = ['Password minimal 8 karakter']
-        isValid = false
+        validationErrors.value.password = ["Password minimal 8 karakter"];
+        isValid = false;
     }
 
-    if (!isValid) return
+    if (!isValid) return;
 
-    const result = await authStore.login({ ...form.value })
+    const result = await authStore.login({ ...form.value });
 
     if (result.success) {
-        await router.push({ name: 'dashboard' })
-        return
+        await router.push({ name: "dashboard" });
+        return;
     }
 
-    if (error.value === 'Unauthorized' || String(error.value).includes('401')) {
-        form.value.password = ''
-        validationErrors.value.password = ['Email atau Password Salah']
-        alert('Login gagal. Email atau password salah.')
-    } else if (typeof error.value === 'object' && error.value !== null) {
-        validationErrors.value = { ...validationErrors.value, ...error.value }
-        alert('Login gagal. Periksa kembali data yang diinput.')
-    } else if (typeof error.value === 'string' && error.value) {
-        alert(error.value)
+    if (error.value === "Unauthorized" || String(error.value).includes("401")) {
+        form.value.password = "";
+        validationErrors.value.password = ["Email atau Password Salah"];
+        showToast("Login gagal. Email atau password salah.");
+    } else if (typeof error.value === "object" && error.value !== null) {
+        validationErrors.value = { ...validationErrors.value, ...error.value };
+        showToast("Login gagal. Periksa kembali data yang diinput.");
+    } else if (typeof error.value === "string" && error.value) {
+        showToast(error.value);
     }
-}
+};
 </script>
 
 <template>
@@ -79,7 +100,7 @@ const handleSubmit = async () => {
                 <!-- Logo -->
                 <header class="login-logo">
                     <img
-                        src="@/assets/images/logos/logo-text.svg"
+                        src="@/assets/images/logos/logo-text.png"
                         alt="Desa Digital Logo"
                         class="login-logo-img"
                     />
@@ -226,6 +247,41 @@ const handleSubmit = async () => {
                 </div>
             </div>
         </div>
+
+        <!-- Toast Popup -->
+        <Transition name="toast">
+            <div v-if="toast.visible" class="login-toast" role="alert">
+                <div class="login-toast-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 9v4"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                        <circle cx="12" cy="16" r="1" fill="currentColor" />
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </div>
+                <p class="login-toast-message">{{ toast.message }}</p>
+                <button class="login-toast-close" @click="dismissToast" aria-label="Tutup">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M18 6L6 18M6 6l12 12"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                    </svg>
+                </button>
+                <div class="login-toast-progress" />
+            </div>
+        </Transition>
     </div>
 </template>
 
@@ -539,11 +595,144 @@ const handleSubmit = async () => {
     }
 }
 
+/* ───────── Toast Popup ───────── */
+.login-toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 340px;
+    max-width: 480px;
+    padding: 16px 20px;
+    background: #1a1a2e;
+    border: 1px solid rgba(255, 80, 112, 0.3);
+    border-radius: 14px;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.24),
+        0 0 0 1px rgba(255, 80, 112, 0.08);
+    overflow: hidden;
+}
+
+.login-toast-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(255, 80, 112, 0.15);
+    color: #ff5070;
+}
+
+.login-toast-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.login-toast-message {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: #f0f0f5;
+    margin: 0;
+}
+
+.login-toast-close {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: rgba(240, 240, 245, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.login-toast-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f0f0f5;
+}
+
+.login-toast-close svg {
+    width: 16px;
+    height: 16px;
+}
+
+.login-toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff5070, #ff8fa3);
+    border-radius: 0 0 14px 14px;
+    animation: toastCountdown 4s linear forwards;
+}
+
+@keyframes toastCountdown {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+/* Toast Transitions */
+.toast-enter-active {
+    animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-leave-active {
+    animation: toastSlideOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-16px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-12px) scale(0.95);
+    }
+}
+
 /* ───────── Reduced Motion ───────── */
 @media (prefers-reduced-motion: reduce) {
     .login-banner-img,
     .login-testimonial {
         animation: none;
+    }
+
+    .toast-enter-active,
+    .toast-leave-active {
+        animation: none;
+    }
+
+    .login-toast-progress {
+        animation: none;
+        width: 0;
     }
 }
 </style>

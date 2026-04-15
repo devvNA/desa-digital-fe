@@ -1,64 +1,64 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from "vue";
 
 const props = defineProps({
     modelValue: {
         type: String,
-        default: '09:00',
+        default: "09:00",
     },
-})
+});
 
-const emit = defineEmits(['update:modelValue', 'close'])
+const emit = defineEmits(["update:modelValue", "close"]);
 
-const mode = ref('hour')
-const hour = ref(13)
-const minute = ref(0)
+const mode = ref("hour");
+const hour = ref(13);
+const minute = ref(0);
 
 // Inisialisasi waktu dari props (form) saat komponen dimuat
 onMounted(() => {
     if (props.modelValue) {
-        const [h, m] = props.modelValue.split(':')
-        hour.value = parseInt(h)
-        minute.value = parseInt(m)
+        const [h, m] = props.modelValue.split(":");
+        hour.value = parseInt(h);
+        minute.value = parseInt(m);
     }
-})
+});
 
-const outerHours = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
-const innerHours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-const minutes = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 0]
+const outerHours = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+const innerHours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const minutes = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 0];
 
 const formattedHour = computed(() =>
-    (hour.value === 24 ? 0 : hour.value).toString().padStart(2, '0'),
-)
-const formattedMinute = computed(() => minute.value.toString().padStart(2, '0'))
+    (hour.value === 24 ? 0 : hour.value).toString().padStart(2, "0"),
+);
+const formattedMinute = computed(() => minute.value.toString().padStart(2, "0"));
 
 const getPosition = (index, total, radius) => {
-    const angle = ((index - 2) * (Math.PI * 2)) / total
+    const angle = ((index - 2) * (Math.PI * 2)) / total;
     return {
         left: `calc(50% + ${Math.cos(angle) * radius}px)`,
         top: `calc(50% + ${Math.sin(angle) * radius}px)`,
-    }
-}
+    };
+};
 
 const handStyle = computed(() => {
-    let radius = mode.value === 'hour' && hour.value >= 1 && hour.value <= 12 ? 65 : 100
-    let rotation = mode.value === 'hour' ? hour.value * 30 : minute.value * 6
-    return { height: `${radius}px`, transform: `rotate(${rotation}deg)` }
-})
+    let radius = mode.value === "hour" && hour.value >= 1 && hour.value <= 12 ? 65 : 100;
+    let rotation = mode.value === "hour" ? hour.value * 30 : minute.value * 6;
+    return { height: `${radius}px`, transform: `rotate(${rotation}deg)` };
+});
 
 const selectHour = (h) => {
-    hour.value = h
-    setTimeout(() => (mode.value = 'minute'), 300)
-}
+    hour.value = h;
+    setTimeout(() => (mode.value = "minute"), 300);
+};
 
-const selectMinute = (m) => (minute.value = m)
+const selectMinute = (m) => (minute.value = m);
 
 // Mengirim nilai kembali ke form dan menutup modal
 const handleConfirm = () => {
-    const timeString = `${formattedHour.value}:${formattedMinute.value}`
-    emit('update:modelValue', timeString)
-    emit('close')
-}
+    const timeString = `${formattedHour.value}:${formattedMinute.value}`;
+    emit("update:modelValue", timeString);
+    emit("close");
+};
 </script>
 
 <template>
@@ -99,7 +99,7 @@ const handleConfirm = () => {
                         :style="getPosition(index, 12, 100)"
                         @click="selectHour(h)"
                     >
-                        {{ h === 24 ? '00' : h }}
+                        {{ h === 24 ? "00" : h }}
                     </div>
                     <div
                         v-for="(h, index) in innerHours"
@@ -122,7 +122,7 @@ const handleConfirm = () => {
                         :style="getPosition(index, 12, 100)"
                         @click="selectMinute(m)"
                     >
-                        {{ m === 0 ? '00' : m }}
+                        {{ m === 0 ? "00" : m }}
                     </div>
                 </div>
             </div>

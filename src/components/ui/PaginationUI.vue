@@ -4,12 +4,12 @@ import {
     clampPage,
     createInitialPaginationState,
     getNextPaginationState,
-} from '@/helpers/pagination'
-import { computed, ref, watch } from 'vue'
+} from "@/helpers/pagination";
+import { computed, ref, watch } from "vue";
 
-const INITIAL_WINDOW_SIZE = 5
-const PROGRESSIVE_WINDOW_SIZE = 5
-const REVEAL_THRESHOLD = 1
+const INITIAL_WINDOW_SIZE = 5;
+const PROGRESSIVE_WINDOW_SIZE = 5;
+const REVEAL_THRESHOLD = 1;
 
 const props = defineProps({
     meta: {
@@ -20,12 +20,12 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-})
+});
 
-const emit = defineEmits(['update:server-options'])
+const emit = defineEmits(["update:server-options"]);
 
-const lastPage = computed(() => Math.max(1, Number(props.meta?.last_page) || 1))
-const currentPage = ref(1)
+const lastPage = computed(() => Math.max(1, Number(props.meta?.last_page) || 1));
+const currentPage = ref(1);
 const revealedState = ref(
     createInitialPaginationState({
         currentPage: 1,
@@ -33,7 +33,7 @@ const revealedState = ref(
         initialWindowSize: INITIAL_WINDOW_SIZE,
         progressiveWindowSize: PROGRESSIVE_WINDOW_SIZE,
     }),
-)
+);
 
 const visiblePages = computed(() =>
     buildVisiblePages({
@@ -42,19 +42,20 @@ const visiblePages = computed(() =>
         paginationState: revealedState.value,
         initialWindowSize: INITIAL_WINDOW_SIZE,
     }),
-)
+);
 
 watch(
     () => [props.meta?.current_page, props.meta?.last_page],
     ([nextCurrentPage, nextLastPage], previousValue = []) => {
-        const [previousCurrentPage, previousLastPage] = previousValue
-        const safeLastPage = Math.max(1, Number(nextLastPage) || 1)
-        const safeCurrentPage = clampPage(nextCurrentPage, safeLastPage)
-        const didLastPageChange = Number(previousLastPage) !== safeLastPage
+        const [previousCurrentPage, previousLastPage] = previousValue;
+        const safeLastPage = Math.max(1, Number(nextLastPage) || 1);
+        const safeCurrentPage = clampPage(nextCurrentPage, safeLastPage);
+        const didLastPageChange = Number(previousLastPage) !== safeLastPage;
         const didPageLeaveVisibleRange =
-            safeCurrentPage < revealedState.value.start || safeCurrentPage > revealedState.value.end
+            safeCurrentPage < revealedState.value.start ||
+            safeCurrentPage > revealedState.value.end;
 
-        currentPage.value = safeCurrentPage
+        currentPage.value = safeCurrentPage;
 
         if (didLastPageChange || didPageLeaveVisibleRange) {
             revealedState.value = createInitialPaginationState({
@@ -62,9 +63,9 @@ watch(
                 lastPage: safeLastPage,
                 initialWindowSize: INITIAL_WINDOW_SIZE,
                 progressiveWindowSize: PROGRESSIVE_WINDOW_SIZE,
-            })
+            });
 
-            return
+            return;
         }
 
         if (Number(previousCurrentPage) !== safeCurrentPage && safeCurrentPage === 1) {
@@ -73,20 +74,20 @@ watch(
                 lastPage: safeLastPage,
                 initialWindowSize: INITIAL_WINDOW_SIZE,
                 progressiveWindowSize: PROGRESSIVE_WINDOW_SIZE,
-            })
+            });
         }
     },
     { immediate: true },
-)
+);
 
 const updatePage = (page) => {
-    const nextPage = clampPage(page, lastPage.value)
+    const nextPage = clampPage(page, lastPage.value);
 
     if (nextPage === currentPage.value) {
-        return
+        return;
     }
 
-    currentPage.value = nextPage
+    currentPage.value = nextPage;
     revealedState.value = getNextPaginationState({
         targetPage: nextPage,
         lastPage: lastPage.value,
@@ -94,13 +95,13 @@ const updatePage = (page) => {
         initialWindowSize: INITIAL_WINDOW_SIZE,
         progressiveWindowSize: PROGRESSIVE_WINDOW_SIZE,
         revealThreshold: REVEAL_THRESHOLD,
-    })
+    });
 
-    emit('update:server-options', {
+    emit("update:server-options", {
         ...props.serverOptions,
         page: nextPage,
-    })
-}
+    });
+};
 </script>
 
 <template>

@@ -1,22 +1,22 @@
 <script setup>
-import { defineEmits, defineProps } from 'vue'
+import { defineEmits, defineProps } from "vue";
 
 defineProps({
     modelValue: {
         type: String,
-        default: '',
+        default: "",
     },
     type: {
         type: String,
-        default: 'text',
+        default: "text",
     },
     placeholder: {
         type: String,
-        default: '',
+        default: "",
     },
     errorMessage: {
         type: [String, Array],
-        default: '',
+        default: "",
     },
     maxlength: {
         type: [String, Number],
@@ -30,9 +30,9 @@ defineProps({
         type: String,
         required: true,
     },
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(["update:modelValue"]);
 </script>
 
 <template>
