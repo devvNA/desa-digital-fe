@@ -1,6 +1,10 @@
 <script setup>
 import { defineEmits, defineProps } from "vue";
 
+defineOptions({
+    name: "BaseInput",
+});
+
 defineProps({
     modelValue: {
         type: String,

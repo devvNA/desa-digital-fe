@@ -1,3 +1,4 @@
+import { handleError } from '@/helpers/errorHelper'
 import { axiosInstance } from '@/plugins/axios'
 import { defineStore } from 'pinia'
 
@@ -17,10 +18,11 @@ export const useDashboardStore = defineStore('dashboard', {
 
             try {
                 const response = await axiosInstance.get('/dashboard')
-                this.dashboardData = response.data.data
-                this.success = true
+                this.dashboardData = response.data?.data ?? {}
+                this.success = response.data?.message ?? true
             } catch (error) {
-                this.error = error
+                this.dashboardData = {}
+                this.error = handleError(error) ?? error
             } finally {
                 this.loading = false
             }
@@ -33,10 +35,11 @@ export const useDashboardStore = defineStore('dashboard', {
 
             try {
                 const response = await axiosInstance.get('/dashboard/head-of-family')
-                this.dashboardData = response.data.data
-                this.success = true
+                this.dashboardData = response.data?.data ?? {}
+                this.success = response.data?.message ?? true
             } catch (error) {
-                this.error = error
+                this.dashboardData = {}
+                this.error = handleError(error) ?? error
             } finally {
                 this.loading = false
             }

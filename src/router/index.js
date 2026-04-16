@@ -5,6 +5,7 @@ import AuthLayout from "@/layouts/AuthLayout.vue";
 import MainLayout from "@/layouts/MainLayout.vue";
 
 const DashboardView = () => import("@/views/DashboardView.vue");
+const SearchView = () => import("@/views/SearchView.vue");
 const HeadOfFamiliesView = () => import("@/views/head-of-family/HeadOfFamiliesView.vue");
 const HeadOfFamilyDetailView = () => import("@/views/head-of-family/HeadOfFamilyDetailView.vue");
 const HeadOfFamilyCreateView = () => import("@/views/head-of-family/HeadOfFamilyCreateView.vue");
@@ -49,6 +50,12 @@ const router = createRouter({
                     name: "dashboard",
                     component: DashboardView,
                     meta: { requiresAuth: true, permission: "dashboard-menu" },
+                },
+                {
+                    path: "search",
+                    name: "search",
+                    component: SearchView,
+                    meta: { requiresAuth: true },
                 },
                 {
                     path: "head-of-family",

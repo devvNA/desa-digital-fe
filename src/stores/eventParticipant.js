@@ -1,6 +1,5 @@
 import { handleError } from "@/helpers/errorHelper";
 import { axiosInstance } from "@/plugins/axios";
-import router from "@/router";
 import { defineStore } from "pinia";
 
 export const useEventParticipantStore = defineStore("eventParticipant", {

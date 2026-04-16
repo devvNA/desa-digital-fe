@@ -1,4 +1,8 @@
 <script setup>
+defineOptions({
+    name: 'BaseButton',
+})
+
 defineProps({
     label: {
         type: String,
