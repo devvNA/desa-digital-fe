@@ -202,6 +202,18 @@ const handleSubmit = async () => {
                     <!-- Submit -->
                     <Button type="submit" label="Masuk" :loading="loading" />
                 </form>
+
+                <div class="login-demo-card">
+                    <p class="login-demo-title">Demo Login Admin</p>
+                    <div class="login-demo-item">
+                        <span class="login-demo-label">Email</span>
+                        <code class="login-demo-value">admin@app.com</code>
+                    </div>
+                    <div class="login-demo-item">
+                        <span class="login-demo-label">Password</span>
+                        <code class="login-demo-value">password</code>
+                    </div>
+                </div>
             </div>
 
             <!-- Footer -->
@@ -351,6 +363,48 @@ const handleSubmit = async () => {
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+.login-demo-card {
+    margin-top: 24px;
+    padding: 16px 18px;
+    border: 1px solid #e2ebe4;
+    border-radius: 16px;
+    background: #f8fcf9;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.login-demo-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #001b1a;
+}
+
+.login-demo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.login-demo-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #5a7a7e;
+}
+
+.login-demo-value {
+    display: inline-block;
+    width: fit-content;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #d9e6dc;
+    font-size: 13px;
+    font-weight: 600;
+    color: #34613a;
 }
 
 /* Field Group */
