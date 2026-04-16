@@ -3,7 +3,7 @@ import { axiosInstance } from "@/plugins/axios";
 
 // ── Fallback assets ──────────────────────────────────────────────
 export const fallbackThumbnail = new URL(
-    "@/assets/images/thumbnails/kk-bansos-1.png",
+    "@/assets/images/thumbnails/kk-bansos-6.jpg",
     import.meta.url,
 ).href;
 export const fallbackProfilePicture = new URL(

@@ -1,12 +1,12 @@
 <script setup>
-import { formatDate, formatRupiah } from '@/helpers/format'
-import { fallbackThumbnail, handleImageError, normalizeImageUrl } from '@/helpers/socialAssistance'
-import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
-import { computed } from 'vue'
+import { formatDate, formatRupiah } from "@/helpers/format";
+import { fallbackThumbnail, handleImageError, normalizeImageUrl } from "@/helpers/socialAssistance";
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
 
-const authStore = useAuthStore()
-const { user } = storeToRefs(authStore)
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 
 const props = defineProps({
     events: {
@@ -23,27 +23,27 @@ const props = defineProps({
     },
     emptyMessage: {
         type: String,
-        default: 'Data event desa belum tersedia.',
+        default: "Data event desa belum tersedia.",
     },
-})
+});
 
 function getThumbnail(value) {
-    return normalizeImageUrl(value, fallbackThumbnail)
+    return normalizeImageUrl(value, fallbackThumbnail);
 }
 
 function getParticipantCountLabel(value) {
-    return `${Number(value) || 0} Warga`
+    return `${Number(value) || 0} Warga`;
 }
 
 function getExecutionDateLabel(value) {
     if (!value) {
-        return '-'
+        return "-";
     }
 
-    return formatDate(value)
+    return formatDate(value);
 }
 
-const hasEvents = computed(() => props.events.length > 0)
+const hasEvents = computed(() => props.events.length > 0);
 </script>
 <template>
     <template v-if="!loading">
@@ -60,7 +60,15 @@ const hasEvents = computed(() => props.events.length > 0)
                         :src="getThumbnail(item.thumbnail)"
                         class="h-full w-full object-cover"
                         alt="development thumbnail"
-                        @error="handleImageError($event, fallbackThumbnail)"
+                        @error="
+                            handleImageError(
+                                $event,
+                                new URL(
+                                    '@/assets/images/thumbnails/kk-event-desa-1.jpeg',
+                                    import.meta.url,
+                                ).href,
+                            )
+                        "
                     />
                 </div>
                 <div class="flex flex-col gap-[6px] w-full ml-4 mr-9">

@@ -1,189 +1,189 @@
 <script setup>
-import IconCalendarBlack from '@/assets/images/icons/calendar-2-black.svg'
-import IconCalendarSecondaryGreen from '@/assets/images/icons/calendar-2-secondary-green.svg'
-import IconClockBlack from '@/assets/images/icons/clock-black.svg'
-import IconClockSecondaryGreen from '@/assets/images/icons/clock-secondary-green.svg'
-import IconDollarBlack from '@/assets/images/icons/dollar-square-black.svg'
-import IconDollarSecondaryGreen from '@/assets/images/icons/dollar-square-secondary-green.svg'
-import IconEditBlack from '@/assets/images/icons/edit-black.svg'
-import IconEditSecondaryGreen from '@/assets/images/icons/edit-secondary-green.svg'
-import Input from '@/components/ui/Input.vue'
-import TimePicker from '@/components/ui/TimePicker.vue'
-import { normalizeAmountInput, normalizeDateInput } from '@/helpers/development'
-import { formatRupiah } from '@/helpers/format'
-import { fallbackThumbnail, handleImageError } from '@/helpers/socialAssistance'
-import router from '@/router'
-import { useEventStore } from '@/stores/event'
-import { storeToRefs } from 'pinia'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
+import IconCalendarBlack from "@/assets/images/icons/calendar-2-black.svg";
+import IconCalendarSecondaryGreen from "@/assets/images/icons/calendar-2-secondary-green.svg";
+import IconClockBlack from "@/assets/images/icons/clock-black.svg";
+import IconClockSecondaryGreen from "@/assets/images/icons/clock-secondary-green.svg";
+import IconDollarBlack from "@/assets/images/icons/dollar-square-black.svg";
+import IconDollarSecondaryGreen from "@/assets/images/icons/dollar-square-secondary-green.svg";
+import IconEditBlack from "@/assets/images/icons/edit-black.svg";
+import IconEditSecondaryGreen from "@/assets/images/icons/edit-secondary-green.svg";
+import Input from "@/components/ui/Input.vue";
+import TimePicker from "@/components/ui/TimePicker.vue";
+import { normalizeAmountInput, normalizeDateInput } from "@/helpers/development";
+import { formatRupiah } from "@/helpers/format";
+import { fallbackThumbnail, handleImageError } from "@/helpers/socialAssistance";
+import router from "@/router";
+import { useEventStore } from "@/stores/event";
+import { storeToRefs } from "pinia";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { RouterLink } from "vue-router";
 
 // -- Reactive state ------------------------------------------------
-const isTimeModalOpen = ref(false)
-const fileInput = ref(null)
-const previewObjectUrl = ref(null)
-const timePickerValue = ref(null)
-const validationErrors = ref({})
+const isTimeModalOpen = ref(false);
+const fileInput = ref(null);
+const previewObjectUrl = ref(null);
+const timePickerValue = ref(null);
+const validationErrors = ref({});
 
 // -- Constants -----------------------------------------------------
-const MAX_AMOUNT_INTEGER_DIGITS = 15
-const MAX_AMOUNT_DECIMAL_DIGITS = 2
+const MAX_AMOUNT_INTEGER_DIGITS = 15;
+const MAX_AMOUNT_DECIMAL_DIGITS = 2;
 
 // -- Store ---------------------------------------------------------
-const eventStore = useEventStore()
-const { loading, error } = storeToRefs(eventStore)
+const eventStore = useEventStore();
+const { loading, error } = storeToRefs(eventStore);
 
 function createInitialEventState() {
     return {
         thumbnail: null,
         thumbnail_url: fallbackThumbnail,
-        name: '',
-        description: '',
-        price: '',
-        date: '',
-        time: '',
+        name: "",
+        description: "",
+        price: "",
+        date: "",
+        time: "",
         is_active: true,
-    }
+    };
 }
 
-const event = ref(createInitialEventState())
+const event = ref(createInitialEventState());
 
 // -- Derived state -------------------------------------------------
 const generalError = computed(() => {
-    if (typeof error.value === 'string') return error.value
-    if (error.value && typeof error.value === 'object') {
-        return 'Data event gagal ditambahkan. Periksa kembali input yang bertanda error.'
+    if (typeof error.value === "string") return error.value;
+    if (error.value && typeof error.value === "object") {
+        return "Data event gagal ditambahkan. Periksa kembali input yang bertanda error.";
     }
 
-    return null
-})
+    return null;
+});
 
 const amountInput = computed({
     get: () => formatAmountInput(event.value.price),
     set: (value) => {
-        event.value.price = normalizeAmountInput(value)
+        event.value.price = normalizeAmountInput(value);
     },
-})
+});
 
 // -- Data helpers --------------------------------------------------
 function normalizeTimeInput(value) {
-    if (!value) return ''
+    if (!value) return "";
 
-    const match = String(value).match(/^(\d{2}:\d{2})/)
-    return match ? match[1] : ''
+    const match = String(value).match(/^(\d{2}:\d{2})/);
+    return match ? match[1] : "";
 }
 
 function formatTimePickerValue(value) {
-    if (!value || typeof value !== 'object') return ''
+    if (!value || typeof value !== "object") return "";
 
-    const hours = Number(value.hours)
-    const minutes = Number(value.minutes)
+    const hours = Number(value.hours);
+    const minutes = Number(value.minutes);
 
     if (!Number.isInteger(hours) || !Number.isInteger(minutes)) {
-        return ''
+        return "";
     }
 
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
 // -- UI helpers ----------------------------------------------------
 function clearErrors() {
-    validationErrors.value = {}
-    error.value = null
+    validationErrors.value = {};
+    error.value = null;
 }
 
 function openFilePicker() {
-    fileInput.value?.click()
+    fileInput.value?.click();
 }
 
 function getFieldError(field) {
-    const err = validationErrors.value[field] ?? error.value?.[field]
-    if (!err) return null
-    return Array.isArray(err) ? err[0] : err
+    const err = validationErrors.value[field] ?? error.value?.[field];
+    if (!err) return null;
+    return Array.isArray(err) ? err[0] : err;
 }
 
 function onImageError(currentEvent) {
-    handleImageError(currentEvent, fallbackThumbnail)
+    handleImageError(currentEvent, fallbackThumbnail);
 }
 
 function handleImageChange(currentEvent) {
-    const file = currentEvent.target.files?.[0]
-    if (!file) return
+    const file = currentEvent.target.files?.[0];
+    if (!file) return;
 
     if (previewObjectUrl.value) {
-        URL.revokeObjectURL(previewObjectUrl.value)
+        URL.revokeObjectURL(previewObjectUrl.value);
     }
 
-    previewObjectUrl.value = URL.createObjectURL(file)
-    event.value.thumbnail = file
-    event.value.thumbnail_url = previewObjectUrl.value
+    previewObjectUrl.value = URL.createObjectURL(file);
+    event.value.thumbnail = file;
+    event.value.thumbnail_url = previewObjectUrl.value;
 }
 
 function handleTimePickerChange(value) {
-    event.value.time = formatTimePickerValue(value)
+    event.value.time = formatTimePickerValue(value);
 }
 
 function formatAmountInput(value) {
-    const normalized = normalizeAmountInput(value)
-    return normalized ? formatRupiah(normalized) : ''
+    const normalized = normalizeAmountInput(value);
+    return normalized ? formatRupiah(normalized) : "";
 }
 
 function validateAmountInput(value) {
-    if (!value) return null
+    if (!value) return null;
 
-    const [integerPart = '', decimalPart = ''] = String(value).split('.')
-    const intDigits = integerPart.replace(/[^\d]/g, '')
-    const decDigits = decimalPart.replace(/\D/g, '')
+    const [integerPart = "", decimalPart = ""] = String(value).split(".");
+    const intDigits = integerPart.replace(/[^\d]/g, "");
+    const decDigits = decimalPart.replace(/\D/g, "");
 
     if (intDigits.length > MAX_AMOUNT_INTEGER_DIGITS) {
-        return `Nominal harga terlalu besar. Maksimal ${MAX_AMOUNT_INTEGER_DIGITS} digit sebelum koma.`
+        return `Nominal harga terlalu besar. Maksimal ${MAX_AMOUNT_INTEGER_DIGITS} digit sebelum koma.`;
     }
 
     if (decDigits.length > MAX_AMOUNT_DECIMAL_DIGITS) {
-        return `Nominal harga hanya boleh memiliki ${MAX_AMOUNT_DECIMAL_DIGITS} angka desimal.`
+        return `Nominal harga hanya boleh memiliki ${MAX_AMOUNT_DECIMAL_DIGITS} angka desimal.`;
     }
 
-    return null
+    return null;
 }
 
 // -- Actions -------------------------------------------------------
 async function handleSubmit() {
-    validationErrors.value = {}
-    error.value = null
+    validationErrors.value = {};
+    error.value = null;
 
-    const amountError = validateAmountInput(event.value.price)
+    const amountError = validateAmountInput(event.value.price);
     if (amountError) {
-        validationErrors.value = { price: [amountError] }
-        return
+        validationErrors.value = { price: [amountError] };
+        return;
     }
 
-    const normalizedAmount = normalizeAmountInput(event.value.price)
+    const normalizedAmount = normalizeAmountInput(event.value.price);
     const result = await eventStore.createEvent({
         thumbnail: event.value.thumbnail,
         name: event.value.name,
         description: event.value.description,
-        price: normalizedAmount === '' ? '' : Number(normalizedAmount),
+        price: normalizedAmount === "" ? "" : Number(normalizedAmount),
         date: normalizeDateInput(event.value.date),
         time: normalizeTimeInput(event.value.time),
-        is_active: event.value.is_active ? '1' : '0',
-    })
+        is_active: event.value.is_active ? "1" : "0",
+    });
 
     if (!result) {
         validationErrors.value =
-            typeof error.value === 'object' && error.value !== null ? error.value : {}
-        return
+            typeof error.value === "object" && error.value !== null ? error.value : {};
+        return;
     }
 
-    await router.replace({ name: 'event' })
+    await router.replace({ name: "event" });
 }
 
-watch(timePickerValue, handleTimePickerChange)
+watch(timePickerValue, handleTimePickerChange);
 
 onBeforeUnmount(() => {
     if (previewObjectUrl.value) {
-        URL.revokeObjectURL(previewObjectUrl.value)
+        URL.revokeObjectURL(previewObjectUrl.value);
     }
-})
+});
 </script>
 
 <template>
@@ -269,7 +269,7 @@ onBeforeUnmount(() => {
                 </section>
                 <div v-if="getFieldError('thumbnail')" class="flex justify-end">
                     <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{
-                        getFieldError('thumbnail')
+                        getFieldError("thumbnail")
                     }}</span>
                 </div>
                 <hr class="border-desa-background" />
@@ -356,7 +356,7 @@ onBeforeUnmount(() => {
                 </section>
                 <div v-if="getFieldError('is_active')" class="flex justify-end">
                     <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{
-                        getFieldError('is_active')
+                        getFieldError("is_active")
                     }}</span>
                 </div>
                 <hr class="border-desa-background" />
@@ -432,7 +432,7 @@ onBeforeUnmount(() => {
                 </section>
                 <div v-if="getFieldError('time')" class="flex justify-end">
                     <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{
-                        getFieldError('time')
+                        getFieldError("time")
                     }}</span>
                 </div>
                 <hr class="border-desa-background" />
@@ -452,7 +452,7 @@ onBeforeUnmount(() => {
                 </section>
                 <div v-if="getFieldError('description')" class="flex justify-end">
                     <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{
-                        getFieldError('description')
+                        getFieldError("description")
                     }}</span>
                 </div>
                 <hr class="border-desa-background w-[calc(100%+48px)] -mx-6" />
@@ -471,7 +471,7 @@ onBeforeUnmount(() => {
                         :disabled="loading"
                         class="py-[18px] rounded-2xl disabled:bg-desa-grey w-[180px] text-center flex justify-center font-medium text-white bg-desa-dark-green transition-all duration-300"
                     >
-                        {{ loading ? 'Creating...' : 'Create Now' }}
+                        {{ loading ? "Creating..." : "Create Now" }}
                     </button>
                 </section>
             </div>
