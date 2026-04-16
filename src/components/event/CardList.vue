@@ -1,6 +1,10 @@
 <script setup>
 import { formatDate, formatRupiah } from "@/helpers/format";
-import { fallbackThumbnail, handleImageError, normalizeImageUrl } from "@/helpers/socialAssistance";
+import {
+    fallbackThumbnailEvent,
+    handleImageError,
+    normalizeImageUrl,
+} from "@/helpers/socialAssistance";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
@@ -28,7 +32,7 @@ const props = defineProps({
 });
 
 function getThumbnail(value) {
-    return normalizeImageUrl(value, fallbackThumbnail);
+    return normalizeImageUrl(value, fallbackThumbnailEvent);
 }
 
 function getParticipantCountLabel(value) {
@@ -59,16 +63,8 @@ const hasEvents = computed(() => props.events.length > 0);
                     <img
                         :src="getThumbnail(item.thumbnail)"
                         class="h-full w-full object-cover"
-                        alt="development thumbnail"
-                        @error="
-                            handleImageError(
-                                $event,
-                                new URL(
-                                    '@/assets/images/thumbnails/kk-event-desa-1.jpeg',
-                                    import.meta.url,
-                                ).href,
-                            )
-                        "
+                        alt="event thumbnail"
+                        @error="handleImageError($event, fallbackThumbnailEvent)"
                     />
                 </div>
                 <div class="flex flex-col gap-[6px] w-full ml-4 mr-9">

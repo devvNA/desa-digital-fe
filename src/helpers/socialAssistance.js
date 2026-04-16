@@ -2,10 +2,26 @@ import { formatToClientTimezone, ucfirst } from "@/helpers/format";
 import { axiosInstance } from "@/plugins/axios";
 
 // ── Fallback assets ──────────────────────────────────────────────
-export const fallbackThumbnail = new URL(
+export const fallbackThumbnailSocialAssistance = new URL(
     "@/assets/images/thumbnails/kk-bansos-6.jpg",
     import.meta.url,
 ).href;
+
+export const fallbackThumbnailDevelopment = new URL(
+    "@/assets/images/thumbnails/kk-pembangunan-desa-3.png",
+    import.meta.url,
+).href;
+
+export const fallbackThumbnailEvent = new URL(
+    "@/assets/images/thumbnails/kk-event-desa-1.jpeg",
+    import.meta.url,
+).href;
+
+export const fallbackThumbnail = new URL(
+    "@/assets/images/thumbnails/placeholder.png",
+    import.meta.url,
+).href;
+
 export const fallbackProfilePicture = new URL(
     "@/assets/images/photos/kk-preview.png",
     import.meta.url,
@@ -36,7 +52,7 @@ export function normalizeImageUrl(value, fallback) {
 }
 
 export function getThumbnail(value) {
-    return normalizeImageUrl(value, fallbackThumbnail);
+    return normalizeImageUrl(value, fallbackThumbnailSocialAssistance);
 }
 
 export function getProfilePicture(value) {

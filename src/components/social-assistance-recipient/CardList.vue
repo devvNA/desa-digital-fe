@@ -1,10 +1,10 @@
 <script setup>
-import { formatRupiah, formatToClientTimezone, ucfirst } from '@/helpers/format'
-import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
+import { formatRupiah, formatToClientTimezone, ucfirst } from "@/helpers/format";
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
 
-const authStore = useAuthStore()
-const { user } = storeToRefs(authStore)
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 
 defineProps({
     socialAssistanceRecipients: {
@@ -19,93 +19,101 @@ defineProps({
         type: Number,
         default: 4,
     },
-})
+});
 
-const fallbackThumbnail = new URL('@/assets/images/thumbnails/kk-bansos-1.png', import.meta.url)
-    .href
-const fallbackProfilePicture = new URL('@/assets/images/photos/kk-photo-1.png', import.meta.url)
-    .href
+const fallbackThumbnail = new URL("@/assets/images/thumbnails/kk-bansos-6.jpg", import.meta.url)
+    .href;
+const fallbackProfilePicture = new URL("@/assets/images/photos/kk-photo-1.png", import.meta.url)
+    .href;
 
 function normalizeImageUrl(value, fallback) {
     if (!value) {
-        return fallback
+        return fallback;
     }
 
-    const nestedHttpIndex = value.indexOf('http', value.indexOf('http') + 1)
+    const nestedHttpIndex = value.indexOf("http", value.indexOf("http") + 1);
 
     if (nestedHttpIndex > 0) {
-        return value.slice(nestedHttpIndex)
+        return value.slice(nestedHttpIndex);
     }
 
-    return value
+    return value;
 }
 
 function getThumbnail(value) {
-    return normalizeImageUrl(value, fallbackThumbnail)
+    return normalizeImageUrl(value, fallbackThumbnail);
 }
 
 function getProfilePicture(value) {
-    return normalizeImageUrl(value, fallbackProfilePicture)
+    return normalizeImageUrl(value, fallbackProfilePicture);
 }
 
 function handleImageError(event, fallback) {
-    event.target.src = fallback
+    event.target.src = fallback;
 }
 
 function formatCategory(value) {
     const map = {
-        staple: 'Bahan Pokok',
-        cash: 'Uang Tunai',
-        'subsidized fuel': 'BBM Subsidi',
-        health: 'Kesehatan',
-    }
+        staple: "Bahan Pokok",
+        cash: "Uang Tunai",
+        "subsidized fuel": "BBM Subsidi",
+        health: "Kesehatan",
+    };
 
-    return map[value] ?? ucfirst(value ?? '-')
+    return map[value] ?? ucfirst(value ?? "-");
 }
 
 function formatCreatedAt(value) {
-    return value ? formatToClientTimezone(value) : '-'
+    return value ? formatToClientTimezone(value) : "-";
 }
 
 function getStatusConfig(status) {
     const map = {
         pending: {
-            label: 'Menunggu',
-            className: 'bg-desa-yellow',
+            label: "Menunggu",
+            className: "bg-desa-yellow",
         },
         approved: {
-            label: 'Disetujui',
-            className: 'bg-desa-green',
+            label: "Disetujui",
+            className: "bg-desa-green",
         },
         rejected: {
-            label: 'Ditolak',
-            className: 'bg-desa-red',
+            label: "Ditolak",
+            className: "bg-desa-red",
         },
-    }
+    };
 
     return (
         map[status] ?? {
-            label: ucfirst(status ?? 'Unknown'),
-            className: 'bg-desa-black',
+            label: ucfirst(status ?? "Unknown"),
+            className: "bg-desa-black",
         }
-    )
+    );
 }
 </script>
 
 <template>
     <template v-if="!loading">
-        <div v-for="item in socialAssistanceRecipients" :key="item.id"
-            class="card flex flex-col gap-4 rounded-3xl p-6 bg-white">
+        <div
+            v-for="item in socialAssistanceRecipients"
+            :key="item.id"
+            class="card flex flex-col gap-4 rounded-3xl p-6 bg-white"
+        >
             <div class="flex items-center justify-between gap-4">
                 <p class="flex items-center gap-1 min-w-0">
-                    <img src="@/assets/images/icons/calendar-2-secondary-green.svg" class="flex size-[18px] shrink-0"
-                        alt="icon" />
+                    <img
+                        src="@/assets/images/icons/calendar-2-secondary-green.svg"
+                        class="flex size-[18px] shrink-0"
+                        alt="icon"
+                    />
                     <span class="font-medium text-sm text-desa-secondary truncate">{{
                         formatCreatedAt(item.created_at)
                     }}</span>
                 </p>
-                <div class="badge rounded-full p-3 gap-2 flex w -[100px] justify-center shrink-0"
-                    :class="getStatusConfig(item.status).className">
+                <div
+                    class="badge rounded-full p-3 gap-2 flex w -[100px] justify-center shrink-0"
+                    :class="getStatusConfig(item.status).className"
+                >
                     <span class="font-semibold text-xs text-white uppercase">{{
                         getStatusConfig(item.status).label
                     }}</span>
@@ -115,19 +123,28 @@ function getStatusConfig(status) {
             <hr class="border-desa-background" />
 
             <div class="flex items-center w-full gap-6">
-                <div class="flex w-[100px] h-20 shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
-                    <img :src="getThumbnail(item.social_assistance?.thumbnail)" class="w-full h-full object-cover"
-                        alt="thumbnail" @error="handleImageError($event, fallbackThumbnail)" />
+                <div
+                    class="flex w-[100px] h-20 shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow"
+                >
+                    <img
+                        :src="getThumbnail(item.social_assistance?.thumbnail)"
+                        class="w-full h-full object-cover"
+                        alt="thumbnail"
+                        @error="handleImageError($event, fallbackThumbnail)"
+                    />
                 </div>
                 <div class="flex flex-col gap-[6px] w-full min-w-0">
                     <p class="font-semibold text-lg leading-[22.5px] line-clamp-1">
-                        {{ item.social_assistance?.name || '-' }}
+                        {{ item.social_assistance?.name || "-" }}
                     </p>
                     <p class="flex items-center gap-1 min-w-0">
-                        <img src="@/assets/images/icons/briefcase-secondary-green.svg" class="flex size-[18px] shrink-0"
-                            alt="icon" />
+                        <img
+                            src="@/assets/images/icons/briefcase-secondary-green.svg"
+                            class="flex size-[18px] shrink-0"
+                            alt="icon"
+                        />
                         <span class="font-medium text-sm text-desa-secondary truncate">{{
-                            item.social_assistance?.provider || '-'
+                            item.social_assistance?.provider || "-"
                         }}</span>
                     </p>
                 </div>
@@ -141,8 +158,13 @@ function getStatusConfig(status) {
                         </p>
                     </div>
                     <div
-                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                        <img src="@/assets/images/icons/money-dark-green.svg" class="flex size-6 shrink-0" alt="icon" />
+                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden"
+                    >
+                        <img
+                            src="@/assets/images/icons/money-dark-green.svg"
+                            class="flex size-6 shrink-0"
+                            alt="icon"
+                        />
                     </div>
                 </div>
             </div>
@@ -151,20 +173,28 @@ function getStatusConfig(status) {
 
             <div class="flex items-center gap-6 justify-between">
                 <div class="flex items-center gap-3 w-[302px] shrink-0 min-w-0">
-                    <div class="flex size-[54px] rounded-full bg-desa-foreshadow overflow-hidden shrink-0">
-                        <img :src="getProfilePicture(item.head_of_family?.profile_picture)"
-                            class="w-full h-full object-cover" alt="photo"
-                            @error="handleImageError($event, fallbackProfilePicture)" />
+                    <div
+                        class="flex size-[54px] rounded-full bg-desa-foreshadow overflow-hidden shrink-0"
+                    >
+                        <img
+                            :src="getProfilePicture(item.head_of_family?.profile_picture)"
+                            class="w-full h-full object-cover"
+                            alt="photo"
+                            @error="handleImageError($event, fallbackProfilePicture)"
+                        />
                     </div>
                     <div class="flex flex-col gap-1 min-w-0">
                         <p class="font-semibold text-lg leading-5 text-desa-black truncate">
-                            {{ item.head_of_family?.user?.name || '-' }}
+                            {{ item.head_of_family?.user?.name || "-" }}
                         </p>
                         <p class="flex items-center gap-1 min-w-0">
-                            <img src="@/assets/images/icons/briefcase-secondary-green.svg"
-                                class="flex size-[18px] shrink-0" alt="icon" />
+                            <img
+                                src="@/assets/images/icons/briefcase-secondary-green.svg"
+                                class="flex size-[18px] shrink-0"
+                                alt="icon"
+                            />
                             <span class="font-medium text-sm text-desa-secondary truncate">{{
-                                item.head_of_family?.occupation || '-'
+                                item.head_of_family?.occupation || "-"
                             }}</span>
                         </p>
                     </div>
@@ -172,9 +202,13 @@ function getStatusConfig(status) {
 
                 <div class="flex items-center gap-3 w-[302px] shrink-0">
                     <div
-                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                        <img src="@/assets/images/icons/receive-square-2-dark-green.svg" class="flex size-6 shrink-0"
-                            alt="icon" />
+                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden"
+                    >
+                        <img
+                            src="@/assets/images/icons/receive-square-2-dark-green.svg"
+                            class="flex size-6 shrink-0"
+                            alt="icon"
+                        />
                     </div>
                     <div class="flex flex-col gap-1">
                         <p class="font-semibold text-lg leading-5 text-desa-dark-green text-nowrap">
@@ -185,29 +219,43 @@ function getStatusConfig(status) {
                 </div>
 
                 <div class="flex items-center gap-3 justify-end w-[252px] shrink-0">
-                    <RouterLink v-if="item.id" :to="{
-                        name: 'manage-social-assistance-recipient',
-                        params: { id: item.id },
-                    }" class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
-                        <span class="font-medium text-white">{{ user?.role === 'admin' ? 'Manage' : 'View Details'
+                    <RouterLink
+                        v-if="item.id"
+                        :to="{
+                            name: 'manage-social-assistance-recipient',
+                            params: { id: item.id },
+                        }"
+                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black"
+                    >
+                        <span class="font-medium text-white">{{
+                            user?.role === "admin" ? "Manage" : "View Details"
                         }}</span>
                     </RouterLink>
-                    <div v-else
-                        class="rounded-2xl bg-desa-foreshadow px-4 py-3 text-sm font-medium text-desa-secondary">
+                    <div
+                        v-else
+                        class="rounded-2xl bg-desa-foreshadow px-4 py-3 text-sm font-medium text-desa-secondary"
+                    >
                         Data bantuan tidak tersedia
                     </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="!socialAssistanceRecipients.length" class="rounded-3xl bg-white p-8 text-center text-desa-secondary">
+        <div
+            v-if="!socialAssistanceRecipients.length"
+            class="rounded-3xl bg-white p-8 text-center text-desa-secondary"
+        >
             Data pengajuan bantuan sosial belum tersedia.
         </div>
     </template>
 
     <div v-else class="flex flex-col gap-[14px]">
-        <div v-for="index in skeletonRows" :key="index" class="sar-skeleton-card rounded-3xl p-6"
-            :style="{ '--skeleton-delay': `${index * 90}ms` }">
+        <div
+            v-for="index in skeletonRows"
+            :key="index"
+            class="sar-skeleton-card rounded-3xl p-6"
+            :style="{ '--skeleton-delay': `${index * 90}ms` }"
+        >
             <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-2 min-w-[220px]">
                     <div class="sar-skeleton-block size-[18px] rounded-full"></div>
@@ -271,7 +319,7 @@ function getStatusConfig(status) {
 }
 
 .sar-skeleton-card::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
@@ -296,16 +344,18 @@ function getStatusConfig(status) {
 .sar-skeleton-block::after,
 .sar-skeleton-card::after,
 .sar-skeleton-pill::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.08) 12%,
-            rgba(255, 255, 255, 0.6) 50%,
-            rgba(255, 255, 255, 0.08) 88%,
-            transparent 100%);
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.08) 12%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.08) 88%,
+        transparent 100%
+    );
     animation: shimmer 1.9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
     animation-delay: var(--skeleton-delay, 0ms);
 }
@@ -317,7 +367,6 @@ function getStatusConfig(status) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
     .sar-skeleton-block::after,
     .sar-skeleton-card::after,
     .sar-skeleton-pill::after {

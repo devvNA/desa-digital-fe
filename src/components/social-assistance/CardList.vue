@@ -1,7 +1,12 @@
 <script setup>
-import { formatRupiah, ucfirst } from '@/helpers/format'
-import { useAuthStore } from '@/stores/auth'
-import { storeToRefs } from 'pinia'
+import { formatRupiah, ucfirst } from "@/helpers/format";
+import {
+    fallbackThumbnailSocialAssistance,
+    handleImageError,
+    normalizeImageUrl,
+} from "@/helpers/socialAssistance";
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
 
 defineProps({
     socialAssistances: {
@@ -16,52 +21,67 @@ defineProps({
         type: Number,
         default: 4,
     },
-})
+});
 
-const authStore = useAuthStore()
-const { user } = storeToRefs(authStore)
-
-const fallbackImage = new URL('@/assets/images/thumbnails/kk-bansos-1.png', import.meta.url).href
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 
 function getThumbnail(value) {
-    return value || fallbackImage
+    return normalizeImageUrl(value, fallbackThumbnailSocialAssistance);
 }
 
 function formatCategory(value) {
     const map = {
-        cash: 'Uang Tunai',
-        goods: 'Barang',
-        service: 'Layanan',
-    }
+        cash: "Uang Tunai",
+        goods: "Barang",
+        service: "Layanan",
+    };
 
-    return map[value] ?? ucfirst(value ?? '-')
+    return map[value] ?? ucfirst(value ?? "-");
 }
 </script>
 
 <template>
     <template v-if="!loading">
-        <div v-for="item in socialAssistances" :key="item.id" class="card flex flex-col gap-6 rounded-3xl bg-white p-6">
+        <div
+            v-for="item in socialAssistances"
+            :key="item.id"
+            class="card flex flex-col gap-6 rounded-3xl bg-white p-6"
+        >
             <div class="flex items-center w-full">
-                <div class="flex h-20 w-[100px] shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow">
-                    <img :src="getThumbnail(item.thumbnail)" class="w-full h-full object-cover" alt="thumbnail" />
+                <div
+                    class="flex h-20 w-[100px] shrink-0 rounded-2xl overflow-hidden bg-desa-foreshadow"
+                >
+                    <img
+                        :src="getThumbnail(item.thumbnail)"
+                        class="w-full h-full object-cover"
+                        alt="social assistance thumbnail"
+                        @error="handleImageError($event, fallbackThumbnailSocialAssistance)"
+                    />
                 </div>
                 <div class="ml-4 mr-9 flex w-full flex-col gap-[6px]">
                     <p class="line-clamp-1 text-lg font-semibold leading-[22.5px]">
                         {{ item.name }}
                     </p>
                     <p class="flex items-center gap-1">
-                        <img src="@/assets/images/icons/briefcase-secondary-green.svg" class="flex size-[18px] shrink-0"
-                            alt="icon" />
+                        <img
+                            src="@/assets/images/icons/briefcase-secondary-green.svg"
+                            class="flex size-[18px] shrink-0"
+                            alt="icon"
+                        />
                         <span class="text-sm font-medium text-desa-secondary">{{
-                            item.provider || '-'
-                            }}</span>
+                            item.provider || "-"
+                        }}</span>
                     </p>
                 </div>
                 <div class="shrink-0">
-                    <RouterLink :to="{ name: 'manage-social-assistance', params: { id: item.id } }"
-                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black">
-                        <span class="font-medium text-white">{{ user?.role === "admin" ? 'Manage' :
-                            'View Detail' }}</span>
+                    <RouterLink
+                        :to="{ name: 'manage-social-assistance', params: { id: item.id } }"
+                        class="flex items-center shrink-0 gap-[10px] rounded-2xl py-4 px-6 bg-desa-black"
+                    >
+                        <span class="font-medium text-white">{{
+                            user?.role === "admin" ? "Manage" : "View Detail"
+                        }}</span>
                     </RouterLink>
                 </div>
             </div>
@@ -71,8 +91,13 @@ function formatCategory(value) {
             <div class="grid grid-cols-3 gap-3">
                 <div class="flex items-center gap-3">
                     <div
-                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden">
-                        <img src="@/assets/images/icons/money-dark-green.svg" class="flex size-6 shrink-0" alt="icon" />
+                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-foreshadow overflow-hidden"
+                    >
+                        <img
+                            src="@/assets/images/icons/money-dark-green.svg"
+                            class="flex size-6 shrink-0"
+                            alt="icon"
+                        />
                     </div>
                     <div class="flex flex-col gap-1">
                         <p class="font-semibold text-lg leading-5 text-desa-dark-green">
@@ -86,9 +111,13 @@ function formatCategory(value) {
 
                 <div class="flex items-center gap-3">
                     <div
-                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-blue/10 overflow-hidden">
-                        <img src="@/assets/images/icons/profile-2user-blue.svg" class="flex size-6 shrink-0"
-                            alt="icon" />
+                        class="flex size-[52px] rounded-2xl items-center justify-center bg-desa-blue/10 overflow-hidden"
+                    >
+                        <img
+                            src="@/assets/images/icons/profile-2user-blue.svg"
+                            class="flex size-6 shrink-0"
+                            alt="icon"
+                        />
                     </div>
                     <div class="flex flex-col gap-1">
                         <p class="font-semibold text-lg leading-5 text-desa-blue">
@@ -99,34 +128,53 @@ function formatCategory(value) {
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <div class="flex size-[52px] rounded-2xl items-center justify-center overflow-hidden"
-                        :class="item.is_available ? 'bg-desa-foreshadow' : 'bg-desa-red/10'">
-                        <img v-if="item.is_available" src="@/assets/images/icons/tick-square-dark-green.svg"
-                            class="flex size-6 shrink-0" alt="icon" />
-                        <img v-else src="@/assets/images/icons/minus-square-red.svg" class="flex size-6 shrink-0"
-                            alt="icon" />
+                    <div
+                        class="flex size-[52px] rounded-2xl items-center justify-center overflow-hidden"
+                        :class="item.is_available ? 'bg-desa-foreshadow' : 'bg-desa-red/10'"
+                    >
+                        <img
+                            v-if="item.is_available"
+                            src="@/assets/images/icons/tick-square-dark-green.svg"
+                            class="flex size-6 shrink-0"
+                            alt="icon"
+                        />
+                        <img
+                            v-else
+                            src="@/assets/images/icons/minus-square-red.svg"
+                            class="flex size-6 shrink-0"
+                            alt="icon"
+                        />
                     </div>
                     <div class="flex flex-col gap-1">
-                        <p class="font-semibold text-lg leading-5"
-                            :class="item.is_available ? 'text-desa-dark-green' : 'text-desa-red'">
-                            {{ item.is_available ? 'Aktif' : 'Nonaktif' }}
+                        <p
+                            class="font-semibold text-lg leading-5"
+                            :class="item.is_available ? 'text-desa-dark-green' : 'text-desa-red'"
+                        >
+                            {{ item.is_available ? "Aktif" : "Nonaktif" }}
                         </p>
                         <p class="font-medium text-sm text-desa-secondary">Status Bantuan</p>
                     </div>
                 </div>
             </div>
 
-            <p class="text-sm leading-6 text-desa-secondary">{{ item.description || '-' }}</p>
+            <p class="text-sm leading-6 text-desa-secondary">{{ item.description || "-" }}</p>
         </div>
 
-        <div v-if="!socialAssistances.length" class="rounded-3xl bg-white p-8 text-center text-desa-secondary">
+        <div
+            v-if="!socialAssistances.length"
+            class="rounded-3xl bg-white p-8 text-center text-desa-secondary"
+        >
             Data bantuan sosial belum tersedia.
         </div>
     </template>
 
     <div v-else class="flex flex-col gap-[14px]">
-        <div v-for="index in skeletonRows" :key="index" class="sa-skeleton-card rounded-3xl p-6"
-            :style="{ '--skeleton-delay': `${index * 90}ms` }">
+        <div
+            v-for="index in skeletonRows"
+            :key="index"
+            class="sa-skeleton-card rounded-3xl p-6"
+            :style="{ '--skeleton-delay': `${index * 90}ms` }"
+        >
             <div class="flex items-center justify-between gap-6">
                 <div class="flex w-[320px] items-center gap-3">
                     <div class="sa-skeleton-block h-20 w-[100px] shrink-0 rounded-2xl"></div>
@@ -139,7 +187,9 @@ function formatCategory(value) {
                     </div>
                 </div>
 
-                <div class="sa-skeleton-pill flex w-[224px] shrink-0 items-center gap-2 rounded-full px-4 py-[14px]">
+                <div
+                    class="sa-skeleton-pill flex w-[224px] shrink-0 items-center gap-2 rounded-full px-4 py-[14px]"
+                >
                     <div class="sa-skeleton-block size-[18px] rounded-full"></div>
                     <div class="sa-skeleton-block h-4 w-24 rounded-full"></div>
                 </div>
@@ -188,7 +238,7 @@ function formatCategory(value) {
 }
 
 .sa-skeleton-card::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
@@ -213,16 +263,18 @@ function formatCategory(value) {
 .sa-skeleton-block::after,
 .sa-skeleton-card::after,
 .sa-skeleton-pill::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.08) 12%,
-            rgba(255, 255, 255, 0.6) 50%,
-            rgba(255, 255, 255, 0.08) 88%,
-            transparent 100%);
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.08) 12%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.08) 88%,
+        transparent 100%
+    );
     animation: shimmer 1.9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
     animation-delay: var(--skeleton-delay, 0ms);
 }
@@ -234,7 +286,6 @@ function formatCategory(value) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
     .sa-skeleton-block::after,
     .sa-skeleton-card::after,
     .sa-skeleton-pill::after {
