@@ -1,105 +1,105 @@
 <script setup>
-import CardList from '@/components/social-assistance-recipient/CardList.vue'
-import PaginationUI from '@/components/ui/PaginationUI.vue'
-import { useSocialAssistanceRecipientStore } from '@/stores/socialAssistanceRecipient'
-import { storeToRefs } from 'pinia'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import CardList from "@/components/social-assistance-recipient/CardList.vue";
+import PaginationUI from "@/components/ui/PaginationUI.vue";
+import { useSocialAssistanceRecipientStore } from "@/stores/socialAssistanceRecipient";
+import { storeToRefs } from "pinia";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
-const socialAssistanceRecipientStore = useSocialAssistanceRecipientStore()
+const socialAssistanceRecipientStore = useSocialAssistanceRecipientStore();
 const { socialAssistanceRecipients, meta, loading, error } = storeToRefs(
     socialAssistanceRecipientStore,
-)
-const { fetchSocialAssistanceRecipientsPaginated } = socialAssistanceRecipientStore
+);
+const { fetchSocialAssistanceRecipientsPaginated } = socialAssistanceRecipientStore;
 
 const serverOptions = ref({
     page: 1,
-    row_per_page: 10,
-})
+    row_per_page: 5,
+});
 
 const filters = ref({
     search: null,
-})
-const searchDebounceDelay = 500
-let searchDebounceId = null
+});
+const searchDebounceDelay = 500;
+let searchDebounceId = null;
 
-const skeletonRows = computed(() => Math.max(4, Number(serverOptions.value.row_per_page) || 4))
+const skeletonRows = computed(() => Math.max(4, Number(serverOptions.value.row_per_page) || 4));
 
 const generalError = computed(() => {
-    if (typeof error.value === 'string') {
-        return error.value
+    if (typeof error.value === "string") {
+        return error.value;
     }
 
-    if (error.value && typeof error.value === 'object') {
-        return 'Data pengajuan bantuan sosial gagal dimuat.'
+    if (error.value && typeof error.value === "object") {
+        return "Data pengajuan bantuan sosial gagal dimuat.";
     }
 
-    return null
-})
+    return null;
+});
 
 const fetchData = async () => {
     await fetchSocialAssistanceRecipientsPaginated({
         ...serverOptions.value,
         ...filters.value,
-    })
-}
+    });
+};
 
 const handleSearch = async () => {
     serverOptions.value = {
         ...serverOptions.value,
         page: 1,
-    }
+    };
 
-    const trimmedSearch = filters.value.search?.trim()
-    filters.value.search = trimmedSearch || null
+    const trimmedSearch = filters.value.search?.trim();
+    filters.value.search = trimmedSearch || null;
 
-    await fetchData()
-}
+    await fetchData();
+};
 
 const handleUpdateServerOptions = async (options) => {
     serverOptions.value = {
         ...serverOptions.value,
         ...options,
-    }
+    };
 
-    await fetchData()
-}
+    await fetchData();
+};
 
 const handlePerPageChange = async () => {
     serverOptions.value = {
         ...serverOptions.value,
         page: 1,
         row_per_page: Number(serverOptions.value.row_per_page) || 10,
-    }
+    };
 
-    await fetchData()
-}
+    await fetchData();
+};
 
 const scheduleSearch = () => {
     if (searchDebounceId) {
-        clearTimeout(searchDebounceId)
+        clearTimeout(searchDebounceId);
     }
 
     searchDebounceId = setTimeout(() => {
-        handleSearch()
-    }, searchDebounceDelay)
-}
+        handleSearch();
+    }, searchDebounceDelay);
+};
 
 watch(
     () => filters.value.search,
     () => {
-        scheduleSearch()
+        scheduleSearch();
     },
-)
+);
 
 onMounted(() => {
-    fetchData()
-})
+    fetchData();
+});
 
 onBeforeUnmount(() => {
     if (searchDebounceId) {
-        clearTimeout(searchDebounceId)
+        clearTimeout(searchDebounceId);
     }
-})
+});
 </script>
 
 <template>

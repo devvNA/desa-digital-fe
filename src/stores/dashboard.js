@@ -1,8 +1,8 @@
-import { handleError } from '@/helpers/errorHelper'
-import { axiosInstance } from '@/plugins/axios'
-import { defineStore } from 'pinia'
+import { handleError } from "@/helpers/errorHelper";
+import { axiosInstance } from "@/plugins/axios";
+import { defineStore } from "pinia";
 
-export const useDashboardStore = defineStore('dashboard', {
+export const useDashboardStore = defineStore("dashboard", {
     state: () => ({
         dashboardData: {},
         loading: false,
@@ -12,37 +12,37 @@ export const useDashboardStore = defineStore('dashboard', {
 
     actions: {
         async getDashboardData() {
-            this.loading = true
-            this.error = null
-            this.success = null
+            this.loading = true;
+            this.error = null;
+            this.success = null;
 
             try {
-                const response = await axiosInstance.get('/dashboard')
-                this.dashboardData = response.data?.data ?? {}
-                this.success = response.data?.message ?? true
+                const response = await axiosInstance.get("/dashboard");
+                this.dashboardData = response.data?.data ?? {};
+                this.success = response.data?.message ?? true;
             } catch (error) {
-                this.dashboardData = {}
-                this.error = handleError(error) ?? error
+                this.dashboardData = {};
+                this.error = handleError(error) ?? error;
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
 
         async getHeadOfFamilyDashboardData() {
-            this.loading = true
-            this.error = null
-            this.success = null
+            this.loading = true;
+            this.error = null;
+            this.success = null;
 
             try {
-                const response = await axiosInstance.get('/dashboard/head-of-family')
-                this.dashboardData = response.data?.data ?? {}
-                this.success = response.data?.message ?? true
+                const response = await axiosInstance.get("/dashboard/head-of-family");
+                this.dashboardData = response.data?.data ?? {};
+                this.success = response.data?.message ?? true;
             } catch (error) {
-                this.dashboardData = {}
-                this.error = handleError(error) ?? error
+                this.dashboardData = {};
+                this.error = handleError(error) ?? error;
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
     },
-})
+});

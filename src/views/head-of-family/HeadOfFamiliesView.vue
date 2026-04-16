@@ -1,82 +1,82 @@
 <script setup>
-import CardList from '@/components/head-of-family/CardList.vue'
-import PaginationUI from '@/components/ui/PaginationUI.vue'
-import { useHeadOfFamilyStore } from '@/stores/headOfFamily'
-import { storeToRefs } from 'pinia'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
+import CardList from "@/components/head-of-family/CardList.vue";
+import PaginationUI from "@/components/ui/PaginationUI.vue";
+import { useHeadOfFamilyStore } from "@/stores/headOfFamily";
+import { storeToRefs } from "pinia";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { RouterLink } from "vue-router";
 
-const headOfFamilyStore = useHeadOfFamilyStore()
-const { headOfFamilies, meta, loading, success, error } = storeToRefs(headOfFamilyStore)
-const { fetchHeadOfFamiliesPaginated } = headOfFamilyStore
+const headOfFamilyStore = useHeadOfFamilyStore();
+const { headOfFamilies, meta, loading, success, error } = storeToRefs(headOfFamilyStore);
+const { fetchHeadOfFamiliesPaginated } = headOfFamilyStore;
 
 const serverOptions = ref({
     page: 1,
-    row_per_page: 10,
-})
+    row_per_page: 5,
+});
 
 const filters = ref({
     search: null,
-})
-const searchDebounceDelay = 500
-let searchDebounceId = null
+});
+const searchDebounceDelay = 500;
+let searchDebounceId = null;
 
-const skeletonRows = computed(() => Math.max(4, Number(serverOptions.value.row_per_page) || 4))
+const skeletonRows = computed(() => Math.max(4, Number(serverOptions.value.row_per_page) || 4));
 
 const fetchData = async () => {
     await fetchHeadOfFamiliesPaginated({
         ...serverOptions.value,
         ...filters.value,
-    })
-}
+    });
+};
 
 const handleSearch = async () => {
     serverOptions.value = {
         ...serverOptions.value,
         page: 1,
-    }
+    };
 
-    const trimmedSearch = filters.value.search?.trim()
-    filters.value.search = trimmedSearch || null
+    const trimmedSearch = filters.value.search?.trim();
+    filters.value.search = trimmedSearch || null;
 
-    await fetchData()
-}
+    await fetchData();
+};
 
 const handleUpdateServerOptions = async (options) => {
     serverOptions.value = {
         ...serverOptions.value,
         ...options,
-    }
+    };
 
-    await fetchData()
-}
+    await fetchData();
+};
 
 const scheduleSearch = () => {
     if (searchDebounceId) {
-        clearTimeout(searchDebounceId)
+        clearTimeout(searchDebounceId);
     }
 
     searchDebounceId = setTimeout(() => {
-        handleSearch()
-    }, searchDebounceDelay)
-}
+        handleSearch();
+    }, searchDebounceDelay);
+};
 
 watch(
     () => filters.value.search,
     () => {
-        scheduleSearch()
+        scheduleSearch();
     },
-)
+);
 
 onMounted(() => {
-    fetchData()
-})
+    fetchData();
+});
 
 onBeforeUnmount(() => {
     if (searchDebounceId) {
-        clearTimeout(searchDebounceId)
+        clearTimeout(searchDebounceId);
     }
-})
+});
 </script>
 
 <template>
@@ -293,7 +293,7 @@ onBeforeUnmount(() => {
 
 .hof-skeleton-card::before,
 .hof-skeleton-pagination::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
@@ -325,7 +325,7 @@ onBeforeUnmount(() => {
 .hof-skeleton-card::after,
 .hof-skeleton-pagination::after,
 .hof-skeleton-pill::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     transform: translateX(-100%);

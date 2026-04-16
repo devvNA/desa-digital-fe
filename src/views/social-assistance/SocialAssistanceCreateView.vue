@@ -1,214 +1,214 @@
 <script setup>
-import IconBagDarkGreen from '@/assets/images/icons/bag-2-dark-green.svg'
-import IconBagSecondaryGreen from '@/assets/images/icons/bag-2-secondary-green.svg'
-import IconBriefcaseBlack from '@/assets/images/icons/briefcase-black.svg'
-import IconBriefcaseSecondaryGreen from '@/assets/images/icons/briefcase-secondary-green.svg'
-import IconCloseCircleRedFill from '@/assets/images/icons/close-circle-red-fill.svg'
-import IconCloseCircleSecondaryGreen from '@/assets/images/icons/close-circle-secondary-green.svg'
-import IconDollarBlack from '@/assets/images/icons/dollar-square-black.svg'
-import IconDollarSecondaryGreen from '@/assets/images/icons/dollar-square-secondary-green.svg'
-import IconEditBlack from '@/assets/images/icons/edit-black.svg'
-import IconEditSecondaryGreen from '@/assets/images/icons/edit-secondary-green.svg'
-import IconGasStationDarkGreen from '@/assets/images/icons/gas-station-dark-green.svg'
-import IconGasStationSecondaryGreen from '@/assets/images/icons/gas-station-secondary-green.svg'
-import IconHealthSecondaryGreen from '@/assets/images/icons/health-secondary-green.svg'
-import IconMoneyDarkGreen from '@/assets/images/icons/money-dark-green.svg'
-import IconMoneySecondaryGreen from '@/assets/images/icons/money-secondary-green.svg'
-import IconTickCircleDarkGreen from '@/assets/images/icons/tick-circle-dark-green.svg'
-import IconTickCircleSecondaryGreen from '@/assets/images/icons/tick-circle-secondary-green.svg'
-import Input from '@/components/ui/Input.vue'
-import { formatRupiah } from '@/helpers/format'
-import router from '@/router'
-import { useSocialAssistanceStore } from '@/stores/socialAssistance'
-import { storeToRefs } from 'pinia'
-import { computed, ref } from 'vue'
+import IconBagDarkGreen from "@/assets/images/icons/bag-2-dark-green.svg";
+import IconBagSecondaryGreen from "@/assets/images/icons/bag-2-secondary-green.svg";
+import IconBriefcaseBlack from "@/assets/images/icons/briefcase-black.svg";
+import IconBriefcaseSecondaryGreen from "@/assets/images/icons/briefcase-secondary-green.svg";
+import IconCloseCircleRedFill from "@/assets/images/icons/close-circle-red-fill.svg";
+import IconCloseCircleSecondaryGreen from "@/assets/images/icons/close-circle-secondary-green.svg";
+import IconDollarBlack from "@/assets/images/icons/dollar-square-black.svg";
+import IconDollarSecondaryGreen from "@/assets/images/icons/dollar-square-secondary-green.svg";
+import IconEditBlack from "@/assets/images/icons/edit-black.svg";
+import IconEditSecondaryGreen from "@/assets/images/icons/edit-secondary-green.svg";
+import IconGasStationDarkGreen from "@/assets/images/icons/gas-station-dark-green.svg";
+import IconGasStationSecondaryGreen from "@/assets/images/icons/gas-station-secondary-green.svg";
+import IconHealthSecondaryGreen from "@/assets/images/icons/health-secondary-green.svg";
+import IconMoneyDarkGreen from "@/assets/images/icons/money-dark-green.svg";
+import IconMoneySecondaryGreen from "@/assets/images/icons/money-secondary-green.svg";
+import IconTickCircleDarkGreen from "@/assets/images/icons/tick-circle-dark-green.svg";
+import IconTickCircleSecondaryGreen from "@/assets/images/icons/tick-circle-secondary-green.svg";
+import Input from "@/components/ui/Input.vue";
+import { formatRupiah } from "@/helpers/format";
+import router from "@/router";
+import { useSocialAssistanceStore } from "@/stores/socialAssistance";
+import { storeToRefs } from "pinia";
+import { computed, ref } from "vue";
 
-const fileInput = ref(null)
-const validationErrors = ref({})
-const socialAssistanceStore = useSocialAssistanceStore()
-const { loading, error, success } = storeToRefs(socialAssistanceStore)
-const { createSocialAssistance } = socialAssistanceStore
+const fileInput = ref(null);
+const validationErrors = ref({});
+const socialAssistanceStore = useSocialAssistanceStore();
+const { loading, error, success } = storeToRefs(socialAssistanceStore);
+const { createSocialAssistance } = socialAssistanceStore;
 
-const fallbackImage = new URL('@/assets/images/thumbnails/kk-bansos-1.png', import.meta.url).href
-const MAX_AMOUNT_INTEGER_DIGITS = 15
-const MAX_AMOUNT_DECIMAL_DIGITS = 2
+const fallbackImage = new URL("@/assets/images/thumbnails/kk-bansos-1.png", import.meta.url).href;
+const MAX_AMOUNT_INTEGER_DIGITS = 15;
+const MAX_AMOUNT_DECIMAL_DIGITS = 2;
 
 const socialAssistance = ref({
     thumbnail: null,
     thumbnail_url: null,
-    name: '',
-    category: '',
-    amount: '',
-    provider: '',
-    description: '',
+    name: "",
+    category: "",
+    amount: "",
+    provider: "",
+    description: "",
     is_available: true,
-})
+});
 
 const categories = [
     {
-        value: 'staple',
-        label: 'Bahan Pokok',
+        value: "staple",
+        label: "Bahan Pokok",
         icon: IconBagSecondaryGreen,
         checkedIcon: IconBagDarkGreen,
     },
     {
-        value: 'cash',
-        label: 'Uang Tunai',
+        value: "cash",
+        label: "Uang Tunai",
         icon: IconMoneySecondaryGreen,
         checkedIcon: IconMoneyDarkGreen,
     },
     {
-        value: 'subsidized fuel',
-        label: 'BBM Subsidi',
+        value: "subsidized fuel",
+        label: "BBM Subsidi",
         icon: IconGasStationSecondaryGreen,
         checkedIcon: IconGasStationDarkGreen,
     },
     {
-        value: 'health',
-        label: 'Kesehatan',
+        value: "health",
+        label: "Kesehatan",
         icon: IconHealthSecondaryGreen,
         checkedIcon: IconHealthSecondaryGreen,
     },
-]
+];
 
 const availabilityOptions = [
     {
         value: true,
-        label: 'Tersedia',
+        label: "Tersedia",
         icon: IconTickCircleSecondaryGreen,
         checkedIcon: IconTickCircleDarkGreen,
     },
     {
         value: false,
-        label: 'Tidak Tersedia',
+        label: "Tidak Tersedia",
         icon: IconCloseCircleSecondaryGreen,
         checkedIcon: IconCloseCircleRedFill,
     },
-]
+];
 
 function getFieldError(field) {
-    const err = validationErrors.value[field] ?? error.value?.[field]
-    if (!err) return null
-    return Array.isArray(err) ? err[0] : err
+    const err = validationErrors.value[field] ?? error.value?.[field];
+    if (!err) return null;
+    return Array.isArray(err) ? err[0] : err;
 }
 
 const generalError = computed(() => {
-    if (typeof error.value === 'string') return error.value
-    if (error.value && typeof error.value === 'object') {
-        return 'Data bantuan sosial gagal ditambahkan. Periksa kembali input yang bertanda error.'
+    if (typeof error.value === "string") return error.value;
+    if (error.value && typeof error.value === "object") {
+        return "Data bantuan sosial gagal ditambahkan. Periksa kembali input yang bertanda error.";
     }
-    return null
-})
+    return null;
+});
 
 const amountInput = computed({
     get: () => formatAmountInput(socialAssistance.value.amount),
     set: (value) => {
-        socialAssistance.value.amount = normalizeAmountInput(value)
+        socialAssistance.value.amount = normalizeAmountInput(value);
     },
-})
+});
 
 function handleImageError(event) {
-    event.target.src = fallbackImage
+    event.target.src = fallbackImage;
 }
 
 function clearErrors() {
-    validationErrors.value = {}
-    error.value = null
-    success.value = null
+    validationErrors.value = {};
+    error.value = null;
+    success.value = null;
 }
 
 function handleImageChange(event) {
-    const file = event.target.files?.[0]
-    if (!file) return
-    socialAssistance.value.thumbnail = file
-    socialAssistance.value.thumbnail_url = URL.createObjectURL(file)
+    const file = event.target.files?.[0];
+    if (!file) return;
+    socialAssistance.value.thumbnail = file;
+    socialAssistance.value.thumbnail_url = URL.createObjectURL(file);
 }
 
 function openFilePicker() {
-    fileInput.value?.click()
+    fileInput.value?.click();
 }
 
 function normalizeAmountInput(value) {
-    if (value === null || value === undefined || value === '') return ''
+    if (value === null || value === undefined || value === "") return "";
 
     const sanitizedValue = String(value)
         .trim()
-        .replace(/[^\d,.-]/g, '')
-    if (!sanitizedValue) return ''
+        .replace(/[^\d,.-]/g, "");
+    if (!sanitizedValue) return "";
 
-    const hasDot = sanitizedValue.includes('.')
-    const hasComma = sanitizedValue.includes(',')
+    const hasDot = sanitizedValue.includes(".");
+    const hasComma = sanitizedValue.includes(",");
 
-    if (!hasDot && !hasComma) return sanitizedValue.replace(/[^\d-]/g, '')
+    if (!hasDot && !hasComma) return sanitizedValue.replace(/[^\d-]/g, "");
 
     if (hasDot && hasComma) {
-        const isCommaDecimal = sanitizedValue.lastIndexOf(',') > sanitizedValue.lastIndexOf('.')
-        const groupingSeparator = isCommaDecimal ? /\./g : /,/g
-        const normalized = sanitizedValue.replace(groupingSeparator, '')
-        return isCommaDecimal ? normalized.replace(',', '.') : normalized
+        const isCommaDecimal = sanitizedValue.lastIndexOf(",") > sanitizedValue.lastIndexOf(".");
+        const groupingSeparator = isCommaDecimal ? /\./g : /,/g;
+        const normalized = sanitizedValue.replace(groupingSeparator, "");
+        return isCommaDecimal ? normalized.replace(",", ".") : normalized;
     }
 
-    const separator = hasComma ? ',' : '.'
-    const parts = sanitizedValue.split(separator)
-    const trailingDigits = parts[parts.length - 1]?.replace(/\D/g, '') ?? ''
-    const isGrouping = parts.length > 2 || trailingDigits.length > 2 || !trailingDigits
+    const separator = hasComma ? "," : ".";
+    const parts = sanitizedValue.split(separator);
+    const trailingDigits = parts[parts.length - 1]?.replace(/\D/g, "") ?? "";
+    const isGrouping = parts.length > 2 || trailingDigits.length > 2 || !trailingDigits;
 
     if (isGrouping)
-        return sanitizedValue.replace(new RegExp(`\\${separator}`, 'g'), '').replace(/[^\d-]/g, '')
+        return sanitizedValue.replace(new RegExp(`\\${separator}`, "g"), "").replace(/[^\d-]/g, "");
 
-    const cleanPattern = hasComma ? /[^\d,-]/g : /[^\d.-]/g
-    const normalized = sanitizedValue.replace(cleanPattern, '')
-    return hasComma ? normalized.replace(',', '.') : normalized
+    const cleanPattern = hasComma ? /[^\d,-]/g : /[^\d.-]/g;
+    const normalized = sanitizedValue.replace(cleanPattern, "");
+    return hasComma ? normalized.replace(",", ".") : normalized;
 }
 
 function formatAmountInput(value) {
-    const normalized = normalizeAmountInput(value)
-    return normalized ? formatRupiah(normalized) : ''
+    const normalized = normalizeAmountInput(value);
+    return normalized ? formatRupiah(normalized) : "";
 }
 
 function validateAmountInput(value) {
-    if (!value) return null
+    if (!value) return null;
 
-    const [integerPart = '', decimalPart = ''] = String(value).split('.')
-    const intDigits = integerPart.replace(/[^\d]/g, '')
-    const decDigits = decimalPart.replace(/\D/g, '')
+    const [integerPart = "", decimalPart = ""] = String(value).split(".");
+    const intDigits = integerPart.replace(/[^\d]/g, "");
+    const decDigits = decimalPart.replace(/\D/g, "");
 
     if (intDigits.length > MAX_AMOUNT_INTEGER_DIGITS) {
-        return `Nominal bantuan terlalu besar. Maksimal ${MAX_AMOUNT_INTEGER_DIGITS} digit sebelum koma.`
+        return `Nominal bantuan terlalu besar. Maksimal ${MAX_AMOUNT_INTEGER_DIGITS} digit sebelum koma.`;
     }
 
     if (decDigits.length > MAX_AMOUNT_DECIMAL_DIGITS) {
-        return `Nominal bantuan hanya boleh memiliki ${MAX_AMOUNT_DECIMAL_DIGITS} angka desimal.`
+        return `Nominal bantuan hanya boleh memiliki ${MAX_AMOUNT_DECIMAL_DIGITS} angka desimal.`;
     }
 
-    return null
+    return null;
 }
 
 async function handleSubmit() {
-    validationErrors.value = {}
+    validationErrors.value = {};
 
-    const amountError = validateAmountInput(socialAssistance.value.amount)
+    const amountError = validateAmountInput(socialAssistance.value.amount);
     if (amountError) {
-        validationErrors.value = { amount: [amountError] }
-        return
+        validationErrors.value = { amount: [amountError] };
+        return;
     }
 
-    const result = await createSocialAssistance(socialAssistance.value)
+    const result = await createSocialAssistance(socialAssistance.value);
     if (!result) {
         validationErrors.value =
-            typeof error.value === 'object' && error.value !== null ? error.value : {}
-        return
+            typeof error.value === "object" && error.value !== null ? error.value : {};
+        return;
     }
 
     if (!result.id) {
-        await router.replace({ name: 'social-assistance' })
-        return
+        await router.replace({ name: "social-assistance" });
+        return;
     }
 
     await router.replace({
-        name: 'manage-social-assistance',
+        name: "manage-social-assistance",
         params: { id: result.id },
-    })
+    });
 }
 </script>
 
@@ -295,7 +295,7 @@ async function handleSubmit() {
                 </section>
                 <div v-if="getFieldError('thumbnail')" class="flex justify-end">
                     <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{
-                        getFieldError('thumbnail')
+                        getFieldError("thumbnail")
                     }}</span>
                 </div>
 
@@ -360,7 +360,7 @@ async function handleSubmit() {
                 </section>
                 <div v-if="getFieldError('category')" class="flex justify-end">
                     <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{
-                        getFieldError('category')
+                        getFieldError("category")
                     }}</span>
                 </div>
 
@@ -424,7 +424,7 @@ async function handleSubmit() {
                             v-if="getFieldError('description')"
                             class="text-left text-desa-red text-xs"
                         >
-                            {{ getFieldError('description') }}
+                            {{ getFieldError("description") }}
                         </span>
                     </div>
                 </section>
@@ -470,7 +470,7 @@ async function handleSubmit() {
                 </section>
                 <div v-if="getFieldError('is_available')" class="flex justify-end">
                     <span class="w-full max-w-[480px] text-left text-desa-red text-xs">{{
-                        getFieldError('is_available')
+                        getFieldError("is_available")
                     }}</span>
                 </div>
 

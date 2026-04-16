@@ -1,105 +1,105 @@
 <script setup>
-import ModalDelete from '@/components/ui/ModalDelete.vue'
-import { formatDate } from '@/helpers/format'
-import router from '@/router'
-import { useHeadOfFamilyStore } from '@/stores/headOfFamily'
-import { storeToRefs } from 'pinia'
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import ModalDelete from "@/components/ui/ModalDelete.vue";
+import { formatDate } from "@/helpers/format";
+import router from "@/router";
+import { useHeadOfFamilyStore } from "@/stores/headOfFamily";
+import { storeToRefs } from "pinia";
+import { computed, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 
-const route = useRoute()
+const route = useRoute();
 
-const headOfFamilyStore = useHeadOfFamilyStore()
-const { headOfFamily, loading } = storeToRefs(headOfFamilyStore)
-const { deleteHeadOfFamily } = headOfFamilyStore
+const headOfFamilyStore = useHeadOfFamilyStore();
+const { headOfFamily, loading } = storeToRefs(headOfFamilyStore);
+const { deleteHeadOfFamily } = headOfFamilyStore;
 
-const fallbackImage = new URL('@/assets/images/photos/kk-photo-1.png', import.meta.url).href
-const showModalDelete = ref(false)
-const deleteId = computed(() => route.params.id)
+const fallbackImage = new URL("@/assets/images/photos/kk-photo-1.png", import.meta.url).href;
+const showModalDelete = ref(false);
+const deleteId = computed(() => route.params.id);
 
-const detail = computed(() => headOfFamily.value ?? {})
-const familyMembers = computed(() => detail.value.family_member ?? [])
-const familyMemberCount = computed(() => familyMembers.value.length)
+const detail = computed(() => headOfFamily.value ?? {});
+const familyMembers = computed(() => detail.value.family_member ?? []);
+const familyMemberCount = computed(() => familyMembers.value.length);
 const groupedFamilyMembers = computed(() => {
     const relationMap = {
-        husband: 'Suami',
-        wife: 'Istri',
-        child: 'Anak',
-    }
+        husband: "Suami",
+        wife: "Istri",
+        child: "Anak",
+    };
 
     return familyMembers.value.reduce((groups, member) => {
-        const relation = member?.relation ?? 'other'
-        const existingGroup = groups.find((group) => group.key === relation)
+        const relation = member?.relation ?? "other";
+        const existingGroup = groups.find((group) => group.key === relation);
 
         if (existingGroup) {
-            existingGroup.items.push(member)
-            return groups
+            existingGroup.items.push(member);
+            return groups;
         }
 
         groups.push({
             key: relation,
-            label: relationMap[relation] ?? 'Lainnya',
+            label: relationMap[relation] ?? "Lainnya",
             items: [member],
-        })
+        });
 
-        return groups
-    }, [])
-})
+        return groups;
+    }, []);
+});
 
 const fetchData = async () => {
-    await headOfFamilyStore.fetchHeadOfFamily(route.params.id)
-}
+    await headOfFamilyStore.fetchHeadOfFamily(route.params.id);
+};
 
 function getProfilePicture(value) {
-    return value || fallbackImage
+    return value || fallbackImage;
 }
 
 function formatGender(value) {
-    return value === 'male' ? 'Pria' : value === 'female' ? 'Wanita' : '-'
+    return value === "male" ? "Pria" : value === "female" ? "Wanita" : "-";
 }
 
 function formatMaritalStatus(value) {
     const map = {
-        single: 'Belum Menikah',
-        married: 'Menikah',
-        divorced: 'Cerai',
-        widowed: 'Janda/Duda',
-    }
+        single: "Belum Menikah",
+        married: "Menikah",
+        divorced: "Cerai",
+        widowed: "Janda/Duda",
+    };
 
-    return map[value] ?? '-'
+    return map[value] ?? "-";
 }
 
 function calculateAge(dateOfBirth) {
     if (!dateOfBirth) {
-        return '-'
+        return "-";
     }
 
-    const birthDate = new Date(dateOfBirth)
-    const today = new Date()
-    let age = today.getFullYear() - birthDate.getFullYear()
-    const monthDiff = today.getMonth() - birthDate.getMonth()
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
 
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age -= 1
+        age -= 1;
     }
 
-    return `${age} Tahun`
+    return `${age} Tahun`;
 }
 
 async function handleDelete() {
-    const isDeleted = await deleteHeadOfFamily(deleteId.value)
+    const isDeleted = await deleteHeadOfFamily(deleteId.value);
 
     if (!isDeleted) {
-        return
+        return;
     }
 
-    showModalDelete.value = false
-    await router.replace({ path: '/head-of-family' })
+    showModalDelete.value = false;
+    await router.replace({ path: "/head-of-family" });
 }
 
 onMounted(() => {
-    fetchData()
-})
+    fetchData();
+});
 </script>
 
 <template>
@@ -150,7 +150,7 @@ onMounted(() => {
                         </div>
                         <div class="flex flex-col gap-[6px] w-full">
                             <p class="font-semibold text-xl line-clamp-1">
-                                {{ detail.user?.name ?? '-' }}
+                                {{ detail.user?.name ?? "-" }}
                             </p>
                             <p class="flex items-center gap-1">
                                 <img
@@ -159,7 +159,7 @@ onMounted(() => {
                                     alt="icon"
                                 />
                                 <span class="font-medium text-sm text-desa-secondary">{{
-                                    detail.occupation ?? '-'
+                                    detail.occupation ?? "-"
                                 }}</span>
                             </p>
                         </div>
@@ -185,7 +185,7 @@ onMounted(() => {
                         </div>
                         <div class="flex flex-col gap-1 w-full">
                             <p class="font-semibold text-xl leading-[22.5px]">
-                                {{ detail.identity_number ?? '-' }}
+                                {{ detail.identity_number ?? "-" }}
                             </p>
                             <span class="font-medium text-desa-secondary">
                                 Nomor Induk Kependudukan
@@ -241,7 +241,7 @@ onMounted(() => {
                         </div>
                         <div class="flex flex-col gap-1 w-full">
                             <p class="font-semibold text-xl leading-[22.5px]">
-                                {{ detail.user?.email ?? '-' }}
+                                {{ detail.user?.email ?? "-" }}
                             </p>
                             <span class="font-medium text-desa-secondary"> Email Address </span>
                         </div>
@@ -259,7 +259,7 @@ onMounted(() => {
                         </div>
                         <div class="flex flex-col gap-1 w-full">
                             <p class="font-semibold text-xl leading-[22.5px]">
-                                {{ detail.phone_number ?? '-' }}
+                                {{ detail.phone_number ?? "-" }}
                             </p>
                             <span class="font-medium text-desa-secondary"> Nomor Hp </span>
                         </div>
@@ -308,7 +308,7 @@ onMounted(() => {
                                 </div>
                                 <div class="flex flex-col gap-[6px] w-full">
                                     <p class="font-semibold text-xl line-clamp-1">
-                                        {{ member.user?.name ?? '-' }}
+                                        {{ member.user?.name ?? "-" }}
                                     </p>
                                     <p class="flex items-center gap-1">
                                         <img
@@ -317,7 +317,7 @@ onMounted(() => {
                                             alt="icon"
                                         />
                                         <span class="font-medium text-sm text-desa-secondary">{{
-                                            member.occupation ?? '-'
+                                            member.occupation ?? "-"
                                         }}</span>
                                     </p>
                                     <p class="font-medium text-sm text-desa-secondary">
@@ -342,7 +342,7 @@ onMounted(() => {
                                     >
                                 </p>
                                 <p class="font-medium leading-5">
-                                    {{ member.identity_number ?? '-' }}
+                                    {{ member.identity_number ?? "-" }}
                                 </p>
                             </div>
                             <div class="flex justify-between items-center gap-4">
@@ -357,7 +357,7 @@ onMounted(() => {
                                     >
                                 </p>
                                 <p class="font-medium leading-5 text-right">
-                                    {{ member.user?.email ?? '-' }}
+                                    {{ member.user?.email ?? "-" }}
                                 </p>
                             </div>
                             <div class="flex justify-between items-center gap-4">
@@ -372,7 +372,7 @@ onMounted(() => {
                                     >
                                 </p>
                                 <p class="font-medium leading-5">
-                                    {{ member.phone_number ?? '-' }}
+                                    {{ member.phone_number ?? "-" }}
                                 </p>
                             </div>
                             <div class="flex justify-between items-center gap-4">
@@ -390,7 +390,7 @@ onMounted(() => {
                                     {{
                                         member.date_of_birth
                                             ? formatDate(member.date_of_birth)
-                                            : '-'
+                                            : "-"
                                     }}
                                 </p>
                             </div>
