@@ -19,9 +19,11 @@ export const useEventParticipantStore = defineStore("eventParticipant", {
         async fetchEventParticipants(params) {
             this.loading = true;
             this.error = null;
+            this.success = null;
             try {
                 const response = await axiosInstance.get("/event-participant", { params });
-                this.eventParticipants = response.data.data;
+                this.eventParticipants = response.data?.data?.data ?? response.data?.data ?? [];
+                this.meta = response.data?.meta ?? response.data?.data?.meta ?? this.meta;
             } catch (error) {
                 this.error = handleError(error);
             } finally {
@@ -32,12 +34,14 @@ export const useEventParticipantStore = defineStore("eventParticipant", {
         async createEventParticipant(payload) {
             this.loading = true;
             this.error = null;
+            this.success = null;
             try {
                 const response = await axiosInstance.post("/event-participant", payload);
-                this.success = response.data.message;
-                return response.data;
+                this.success = response.data?.message ?? null;
+                return response.data?.data ?? null;
             } catch (error) {
                 this.error = handleError(error);
+                return null;
             } finally {
                 this.loading = false;
             }
